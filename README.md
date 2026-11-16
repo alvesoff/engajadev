@@ -23,11 +23,11 @@ O produto vai ser definido junto com a comunidade. As regras acima são o ponto 
 - **Como funciona o placar?** Por temporada (mensal, por exemplo) ou acumulado?
 - **Quais são as recompensas?**
 
-Cada pergunta pode virar uma conversa nas [Discussions](https://github.com/alvesoff/engajadev/discussions).
+A primeira já está em discussão: [Como confirmar que o engajamento aconteceu?](https://github.com/alvesoff/engajadev/discussions/2). As outras podem virar conversas nas [Discussions](https://github.com/alvesoff/engajadev/discussions).
 
 ## Stack
 
-Ainda não definida. A comunidade vai escolher na votação aberta nas [Discussions](https://github.com/alvesoff/engajadev/discussions).
+Ainda não definida. A comunidade vai escolher na [votação da stack](https://github.com/alvesoff/engajadev/discussions/1).
 
 ## Como executar
 
