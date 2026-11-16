@@ -1,12 +1,14 @@
 # EngajaDev
 
-Plataforma de código aberto, feita pela comunidade, onde devs divulgam seus posts sobre tecnologia e ganham pontos por engajar nos posts uns dos outros, competindo num placar.
+Plataforma de código aberto para a comunidade [AceleraDev](https://aceleradev.com.br/), do [Guilherme Pc](https://www.youtube.com/@pctheone). Os membros divulgam seus posts sobre tecnologia e ganham pontos por engajar nos posts uns dos outros, competindo num placar.
+
+O EngajaDev é uma iniciativa independente, feita por membros da comunidade. Não é um projeto oficial da AceleraDev.
 
 ## O que o projeto faz
 
 A ideia inicial:
 
-1. Um membro cadastra o link de um post dele sobre tecnologia (LinkedIn, blog, YouTube e outras redes).
+1. Um membro da AceleraDev cadastra o link de um post dele sobre tecnologia (LinkedIn, blog, YouTube e outras redes).
 2. Os outros membros abrem o link e engajam: curtem, comentam, compartilham.
 3. Cada engajamento vale pontos.
 4. Os pontos formam um placar, e quem mais engaja sobe no ranking.
