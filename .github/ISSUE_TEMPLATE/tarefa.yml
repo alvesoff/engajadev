@@ -1,0 +1,25 @@
+name: Tarefa ou funcionalidade
+description: Proponha algo para construir no EngajaDev
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: O que precisa ser resolvido e por quê.
+    validations:
+      required: true
+  - type: textarea
+    id: proposta
+    attributes:
+      label: Proposta
+      description: Como você imagina a solução.
+    validations:
+      required: true
+  - type: textarea
+    id: criterio
+    attributes:
+      label: Critério de pronto
+      description: Como saber que está pronto.
+    validations:
+      required: false
