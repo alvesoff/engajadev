@@ -1,6 +1,6 @@
 # Como contribuir com o EngajaDev
 
-Obrigado por querer ajudar. O EngajaDev é construído pela comunidade e mantido por [alvesoff](https://github.com/alvesoff), que revisa e aprova as contribuições.
+Obrigado por querer ajudar. O EngajaDev é construído por membros da comunidade AceleraDev. O repositório é mantido por [alvesoff](https://github.com/alvesoff), que revisa e aprova as contribuições. Ele cuida só deste repositório e não fala pela AceleraDev.
 
 ## Formas de contribuir
 
