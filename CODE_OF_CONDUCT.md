@@ -39,7 +39,7 @@ Os espaços da AceleraDev seguem as regras da própria AceleraDev. Aqui, "lidera
 
 ## Aplicação
 
-Ocorrências de comportamentos abusivos, de assédio ou que sejam inaceitáveis por qualquer outro motivo poderão ser reportadas para a liderança da comunidade, responsável pela aplicação, por mensagem privada ao mantenedor do projeto, [alvesoff](https://github.com/alvesoff). Todas as reclamações serão revisadas e investigadas imediatamente e de maneira justa.
+Ocorrências de comportamentos abusivos, de assédio ou que sejam inaceitáveis por qualquer outro motivo poderão ser reportadas para a liderança da comunidade, responsável pela aplicação, por mensagem privada ao mantenedor do projeto no LinkedIn: [linkedin.com/in/alvesdossan](https://www.linkedin.com/in/alvesdossan/). Todas as reclamações serão revisadas e investigadas imediatamente e de maneira justa.
 
 A liderança da comunidade tem a obrigação de respeitar a privacidade e a segurança de quem reportar qualquer incidente.
 
