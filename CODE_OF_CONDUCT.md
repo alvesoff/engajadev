@@ -33,11 +33,13 @@ A liderança da comunidade tem o direito e a responsabilidade de remover, editar
 
 ## Escopo
 
-Este Código de Conduta se aplica dentro de todos os espaços da comunidade e também se aplica quando uma pessoa estiver representando oficialmente a comunidade em espaços públicos. Exemplos de representação da nossa comunidade incluem usar um endereço de e-mail oficial, postar em contas oficiais de mídias sociais ou atuar como uma pessoa indicada como representante em um evento online ou offline.
+Este Código de Conduta se aplica aos espaços do EngajaDev (este repositório, as issues, os pull requests e as Discussions) e também quando uma pessoa estiver representando oficialmente o projeto em espaços públicos. Exemplos de representação do projeto incluem usar um endereço de e-mail oficial, postar em contas oficiais de mídias sociais ou atuar como uma pessoa indicada como representante em um evento online ou offline.
+
+Os espaços da AceleraDev seguem as regras da própria AceleraDev. Aqui, "liderança da comunidade" é quem mantém este repositório.
 
 ## Aplicação
 
-Ocorrências de comportamentos abusivos, de assédio ou que sejam inaceitáveis por qualquer outro motivo poderão ser reportadas para a liderança da comunidade, responsável pela aplicação, por mensagem privada ao mantenedor do projeto, [alvesoff](https://github.com/alvesoff). Todas as reclamações serão revisadas e investigadas imediatamente e de maneira justa.
+Ocorrências de comportamentos abusivos, de assédio ou que sejam inaceitáveis por qualquer outro motivo poderão ser reportadas para a liderança da comunidade, responsável pela aplicação, por mensagem privada ao mantenedor do projeto no LinkedIn: [linkedin.com/in/alvesdossan](https://www.linkedin.com/in/alvesdossan/). Todas as reclamações serão revisadas e investigadas imediatamente e de maneira justa.
 
 A liderança da comunidade tem a obrigação de respeitar a privacidade e a segurança de quem reportar qualquer incidente.
 
