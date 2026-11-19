@@ -10,6 +10,14 @@ export const PADRAO = {
     comentarioRecebido: 2,
     publicarPost: 0,
   },
+  limites: {
+    pontosDiariosEngajador: 30, // máximo por dia curtindo e comentando (0 = sem limite)
+    pontosDiariosCriador: 60, // máximo por dia recebendo curtidas e comentários (0 = sem limite)
+    cooldownSegundos: 10, // tempo mínimo entre duas curtidas ou comentários
+    comentarioMinCaracteres: 20, // comentário mais curto é aceito, mas não pontua
+    comentariosPontuadosPorPost: 1, // quantos comentários da mesma pessoa no mesmo post pontuam (0 = todos)
+    postsPorDia: 5, // quantos links cada pessoa pode divulgar por dia (0 = sem limite)
+  },
   periodo: {
     fusoHorarioMinutos: -180, // Brasília
     inicioSemanaDia: 1, // segunda-feira

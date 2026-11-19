@@ -51,6 +51,18 @@ Todas recebem e devolvem JSON. Em erro, a resposta é `{ "erro": "mensagem em po
 | `GET` | `/api/rankings?periodo=semana\|geral&tipo=engajador\|criador` | Top da Semana (zera toda segunda 00:00 de Brasília) ou Top Geral (só quem tem 10 pontos ou mais) |
 | `GET` | `/api/carteira` | Carteira de pontos de prêmio: saldo de sempre, pontos da semana e de hoje, e extrato |
 
+## Regras contra trapaça (anti-gaming)
+
+- **Limite diário de pontos:** até 30 pontos por dia como engajador e 60 como criador. Passou do limite, a ação acontece, mas não pontua.
+- **Cooldown:** 10 segundos entre duas curtidas ou comentários da mesma pessoa (`429` com o tempo que falta).
+- **Comentar vale mais que curtir:** 3 contra 1 para quem engaja, 2 contra 1 para o autor.
+- **Sem pontos no próprio post.**
+- **Comentário com menos de 20 caracteres** é publicado, mas não pontua. Só o primeiro comentário da pessoa em cada post pontua.
+- **Curtida pontua uma vez só:** descurtir devolve os pontos, e curtir de novo não soma de novo.
+- **Até 5 posts por dia.**
+
+O dia vira à meia-noite de Brasília.
+
 ## Segurança
 
 - Senha com hash **scrypt** (N=2^15, r=8, p=3, parâmetros da OWASP) e sal aleatório. A senha nunca sai do servidor.

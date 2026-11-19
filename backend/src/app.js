@@ -5,6 +5,7 @@ import { carregarSessao, rotasAuth } from './rotas/auth.js';
 import { rotasPosts } from './rotas/posts.js';
 import { rotasRankings } from './rotas/rankings.js';
 import { rotasCarteira } from './rotas/carteira.js';
+import { conferirCooldown, conferirLimitePosts } from './pontos.js';
 
 /**
  * Monta a aplicação.
@@ -17,6 +18,8 @@ import { rotasCarteira } from './rotas/carteira.js';
  */
 export function criarApp({ db, agora = () => Date.now(), limites, trustProxy = false, regras } = {}) {
   const ctx = { db, agora, regras: criarLeitorRegras({ extra: regras }) };
+  ctx.antesDeEngajar = (usuario) => conferirCooldown(ctx, usuario.id);
+  ctx.antesDePostar = (usuario) => conferirLimitePosts(ctx, usuario.id);
 
   const app = express();
   app.disable('x-powered-by');
