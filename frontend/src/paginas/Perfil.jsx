@@ -51,6 +51,12 @@ export default function Perfil() {
           <p className="sutil">
             @{u.usuario} · na comunidade desde {desde}
           </p>
+          {u.bio && <p className="bio">{u.bio}</p>}
+          {meu && !u.bio && (
+            <p className="sutil">
+              <Link to="/conta">Escreva uma bio</Link> para quem visita seu perfil saber quem você é.
+            </p>
+          )}
           {meu && (
             <div className="linha">
               <Link to="/carteira" className="botao">

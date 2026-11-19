@@ -14,7 +14,7 @@ São duas pastas separadas. O backend sobe primeiro.
 # backend (API) em http://localhost:4400
 cd backend
 npm install
-npm test                                  # 150 testes automáticos
+npm test                                  # 154 testes automáticos
 DB_PATH=./data/exemplo.db npm run semear  # opcional: dados de exemplo
 DB_PATH=./data/exemplo.db ADMIN_EMAILS=anadev@exemplo.com npm start
 
@@ -94,6 +94,7 @@ As contas de exemplo usam a senha `senha-forte-123`. Com o comando acima, `anade
 - Endereço `/u/<usuário>`, aberto para qualquer pessoa, mesmo sem conta.
 - Mostra os posts, o total de pontos, os pontos da semana, quantas curtidas e comentários a pessoa fez e a posição dela em cada ranking.
 - O e-mail nunca aparece.
+- **Bio:** em "Minha conta" a pessoa escreve uma bio de até 160 caracteres e pode mudar o nome. A bio aparece no perfil público. O @usuário e o e-mail não mudam por ali. Quem ainda não tem bio vê no próprio perfil um convite para escrever.
 
 ### Tudo configurável
 
@@ -175,7 +176,7 @@ Entrar/criar conta, feed, divulgar post, post (curtir e comentar), rankings, car
   - O custo é copiado no resgate: se o preço mudar depois, o histórico não muda.
   - Para brindes físicos, o sistema **não pede endereço** (cuidado com dados pessoais, LGPD). A organização combina a entrega pelo e-mail da conta.
   - O destaque só vale para post próprio, e o mesmo post não pode estar em dois destaques ao mesmo tempo.
-- **Fora desta entrega:** bio no perfil, recuperar senha por e-mail e entrar com Google ou GitHub (precisam de um serviço de e-mail ou de chaves dessas contas), integração com as APIs das redes (precisa de chaves de cada rede).
+- **Fora desta entrega:** recuperar senha por e-mail e entrar com Google ou GitHub (precisam de um serviço de e-mail ou de chaves dessas contas) e integração com as APIs das redes (precisa de chaves de cada rede).
 
 ## Mapa do código
 
@@ -196,7 +197,7 @@ backend/
     premios.js         catálogo, resgate, entrega e cancelamento (2ª fase)
     semear.js          dados de exemplo (npm run semear)
     rotas/             auth, posts, rankings, carteira, usuarios, regras, premios
-  test/                150 testes automáticos
+  test/                154 testes automáticos
 frontend/
   src/
     App.jsx            menu (embaixo no celular, no topo no computador) e rotas

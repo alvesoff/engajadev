@@ -32,8 +32,21 @@ export const usuarioPublico = (u) => ({
   nome: u.nome,
   usuario: u.usuario,
   email: u.email,
+  bio: u.bio ?? '',
   criadoEm: u.criado_em,
 });
+
+export const BIO_MAX = 160;
+
+/** Confere nome e bio do perfil. A bio vira uma linha só (sem quebras nem espaços repetidos). */
+function validarPerfil(corpo) {
+  const nome = texto(corpo?.nome);
+  const bio = texto(corpo?.bio).replace(/\s+/g, ' ');
+  if (!nome) throw erro(400, 'Informe seu nome.', { campo: 'nome' });
+  if (nome.length < 2 || nome.length > 60) throw erro(400, 'O nome deve ter de 2 a 60 caracteres.', { campo: 'nome' });
+  if (bio.length > BIO_MAX) throw erro(400, `A bio pode ter até ${BIO_MAX} caracteres.`, { campo: 'bio' });
+  return { nome, bio };
+}
 
 /** Middleware: coloca req.usuario quando o cookie aponta para uma sessão válida. */
 export function carregarSessao(ctx) {
@@ -212,6 +225,13 @@ export function rotasAuth(ctx, { porEmail = 5, porIp = 50, janelaMs = 15 * MIN }
   });
 
   r.get('/eu', exigirLogin, (req, res) => res.json(eu(req.usuario)));
+
+  /** Editar o próprio perfil: nome e bio. O @usuário e o e-mail não mudam aqui. */
+  r.put('/perfil', exigirLogin, (req, res) => {
+    const { nome, bio } = validarPerfil(req.body);
+    ctx.db.prepare('UPDATE usuarios SET nome = ?, bio = ? WHERE id = ?').run(nome, bio, req.usuario.id);
+    res.json(eu(ctx.db.prepare('SELECT * FROM usuarios WHERE id = ?').get(req.usuario.id)));
+  });
 
   // ---- segurança da conta ----
   const tokenAtual = (req) => hashToken(lerCookie(req, COOKIE) ?? '');

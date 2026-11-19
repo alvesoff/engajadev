@@ -25,7 +25,7 @@ export function perfilPublico(ctx, u, eu = 0) {
     )
     .get({ id: u.id });
   return {
-    usuario: { id: u.id, nome: u.nome, usuario: u.usuario, criadoEm: u.criado_em },
+    usuario: { id: u.id, nome: u.nome, usuario: u.usuario, bio: u.bio ?? '', criadoEm: u.criado_em },
     // total = tudo o que a pessoa já ganhou (resgatar prêmios não diminui o que aparece no perfil)
     pontos: { total: carteira.totalGanho, semana: carteira.semana, porPapel: carteira.porPapel },
     posicoes,
