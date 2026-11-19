@@ -3,6 +3,7 @@ import { ErroHttp } from './erros.js';
 import { criarLeitorRegras } from './regras.js';
 import { carregarSessao, rotasAuth } from './rotas/auth.js';
 import { rotasPosts } from './rotas/posts.js';
+import { rotasRankings } from './rotas/rankings.js';
 
 /**
  * Monta a aplicação.
@@ -11,9 +12,10 @@ import { rotasPosts } from './rotas/posts.js';
  * @param {() => number} [opcoes.agora] relógio em ms (dá para trocar nos testes)
  * @param {object} [opcoes.limites] limite de tentativas de login { porEmail, porIp, janelaMs }
  * @param {boolean|string|number} [opcoes.trustProxy] valor do "trust proxy" do Express
+ * @param {object} [opcoes.regras] regras que valem por cima do padrão (usado nos testes)
  */
-export function criarApp({ db, agora = () => Date.now(), limites, trustProxy = false } = {}) {
-  const ctx = { db, agora, regras: criarLeitorRegras() };
+export function criarApp({ db, agora = () => Date.now(), limites, trustProxy = false, regras } = {}) {
+  const ctx = { db, agora, regras: criarLeitorRegras({ extra: regras }) };
 
   const app = express();
   app.disable('x-powered-by');
@@ -23,6 +25,7 @@ export function criarApp({ db, agora = () => Date.now(), limites, trustProxy = f
 
   app.use('/api/auth', rotasAuth(ctx, limites));
   app.use('/api/posts', rotasPosts(ctx));
+  app.use('/api/rankings', rotasRankings(ctx));
   app.use('/api', (_req, _res, next) => next(new ErroHttp(404, 'Rota não encontrada.')));
 
   // eslint-disable-next-line no-unused-vars

@@ -2,17 +2,21 @@ import { abrirBanco } from '../src/db.js';
 import { criarApp } from '../src/app.js';
 
 export const MIN = 60_000;
+export const HORA = 60 * MIN;
+export const DIA = 24 * HORA;
+/** Quinta-feira, 19/11/2026, 12:00 em Brasília (15:00 UTC). */
+export const QUINTA_MEIO_DIA = Date.UTC(2026, 10, 19, 15, 0, 0);
 
 /** Sobe a API numa porta livre, com banco em memória e relógio controlado. */
-export async function criarAmbiente({ limites } = {}) {
+export async function criarAmbiente({ limites, regras, inicio } = {}) {
   const relogio = {
-    agora: Date.UTC(2026, 10, 19, 15, 0, 0),
+    agora: inicio ?? QUINTA_MEIO_DIA,
     avancar(ms) {
       this.agora += ms;
     },
   };
   const db = abrirBanco(':memory:');
-  const app = criarApp({ db, agora: () => relogio.agora, limites });
+  const app = criarApp({ db, agora: () => relogio.agora, limites, regras });
   const servidor = await new Promise((ok) => {
     const s = app.listen(0, '127.0.0.1', () => ok(s));
   });

@@ -10,6 +10,15 @@ export const PADRAO = {
     comentarioRecebido: 2,
     publicarPost: 0,
   },
+  periodo: {
+    fusoHorarioMinutos: -180, // Brasília
+    inicioSemanaDia: 1, // segunda-feira
+    inicioSemanaHora: 0, // meia-noite
+  },
+  ranking: {
+    limiarTopGeral: 10,
+    tamanho: 50,
+  },
   texto: {
     tituloMax: 120,
     descricaoMax: 500,
@@ -17,7 +26,15 @@ export const PADRAO = {
   },
 };
 
-export function criarLeitorRegras() {
-  const regras = () => PADRAO;
+function mesclar(base, extra) {
+  const out = {};
+  for (const [grupo, valores] of Object.entries(base)) out[grupo] = { ...valores, ...extra?.[grupo] };
+  return out;
+}
+
+/** @param {{ extra?: object }} opcoes extra: valores que valem por cima do padrão */
+export function criarLeitorRegras({ extra } = {}) {
+  const valor = mesclar(PADRAO, extra);
+  const regras = () => valor;
   return regras;
 }
