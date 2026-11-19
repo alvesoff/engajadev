@@ -181,11 +181,12 @@ export function rotasPosts(ctx) {
 
   /**
    * Remover um post. Ele some do feed, do perfil e dos destaques, mas a linha fica no banco.
-   * - O autor apaga o próprio post: os pontos de todos ficam (foram ganhos de verdade) e o link
-   *   fica livre para ser divulgado de novo.
+   * - O autor apaga o próprio post: os pontos de todos ficam (foram ganhos de verdade).
    * - O admin remove (spam, link quebrado, fora do tema): os pontos que o AUTOR ganhou com o post
    *   saem do livro-razão e o link continua bloqueado. Quem curtiu ou comentou agiu de boa-fé e
    *   mantém os pontos (e o saldo de ninguém fica negativo por culpa de outra pessoa).
+   * Nos dois casos o link continua bloqueado: apagar e divulgar de novo faria todos pontuarem
+   * outra vez pelo mesmo post.
    */
   r.delete('/:id', exigirLogin, (req, res) => {
     const post = buscarPost(ctx, req.params.id, req.usuario.id);
@@ -195,11 +196,9 @@ export function rotasPosts(ctx) {
     const estornados = transacao(ctx.db, () => {
       ctx.db
         .prepare(
-          `UPDATE posts SET removido_em = ?, removido_por = ?, removido_motivo = ?,
-             url = CASE WHEN ? = 'autor' THEN url || '#removido-' || id ELSE url END
-           WHERE id = ?`,
+          'UPDATE posts SET removido_em = ?, removido_por = ?, removido_motivo = ? WHERE id = ?',
         )
-        .run(ctx.agora(), req.usuario.id, motivo, motivo, post.id);
+        .run(ctx.agora(), req.usuario.id, motivo, post.id);
       if (motivo === 'autor') return 0;
       return Number(ctx.db.prepare('DELETE FROM lancamentos WHERE post_id = ? AND usuario_id = ?').run(post.id, post.usuario_id).changes);
     });

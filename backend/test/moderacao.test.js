@@ -26,7 +26,7 @@ async function montar() {
 const titulos = async (c, caminho = '/api/posts') => (await c.get(caminho)).body.posts.map((p) => p.titulo);
 
 describe('moderação: remover posts', () => {
-  test('o autor apaga o próprio post: some de tudo, os pontos ficam e o link pode voltar', async () => {
+  test('o autor apaga o próprio post: some de tudo, os pontos ficam e o link não volta (sem pontuar duas vezes)', async () => {
     const m = await montar();
     try {
       const antes = { ana: m.amb.pontosDe(m.ana.id), bia: m.amb.pontosDe(m.bia.id) };
@@ -52,10 +52,12 @@ describe('moderação: remover posts', () => {
       assert.deepEqual(m.amb.pontosDe(m.ana.id), antes.ana);
       assert.deepEqual(m.amb.pontosDe(m.bia.id), antes.bia);
 
-      // o mesmo link pode ser divulgado de novo
-      const denovo = await m.bia.post('/api/posts', { url: 'https://dev.to/bia/meu-post', titulo: 'Post da Bia, agora certo' });
-      assert.equal(denovo.status, 201);
-      assert.equal(denovo.body.post.url, 'https://dev.to/bia/meu-post');
+      // apagar e divulgar o mesmo link de novo faria todos pontuarem duas vezes pelo mesmo post
+      const denovo = await m.bia.post('/api/posts', { url: 'https://dev.to/bia/meu-post', titulo: 'Post da Bia de novo' });
+      assert.equal(denovo.status, 409);
+      assert.equal(denovo.body.erro, 'Este link já foi divulgado no EngajaDev.');
+      assert.deepEqual(m.amb.pontosDe(m.ana.id), antes.ana);
+      assert.deepEqual(m.amb.pontosDe(m.bia.id), antes.bia);
 
       // apagar de novo: já não existe
       assert.equal((await m.bia.del(`/api/posts/${m.post}`)).status, 404);

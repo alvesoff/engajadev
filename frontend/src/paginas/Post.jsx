@@ -123,7 +123,7 @@ export default function Post() {
               <>
                 <p role="alert">
                   {proprio
-                    ? 'Apagar este post? Ele sai do feed e do seu perfil. Os pontos que você já ganhou continuam.'
+                    ? 'Apagar este post? Ele sai do feed e do seu perfil, e este link não poderá ser divulgado de novo. Os pontos que você já ganhou continuam.'
                     : 'Remover este post? Ele sai do site e o autor perde os pontos ganhos com ele. Quem curtiu ou comentou continua com os pontos.'}
                 </p>
                 <button type="button" className="botao perigo cheio pequeno" onClick={remover} disabled={removendo}>

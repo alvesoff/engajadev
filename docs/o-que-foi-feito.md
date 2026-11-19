@@ -114,8 +114,8 @@ As contas de exemplo usam a senha `senha-forte-123`. Com o comando acima, `anade
 
 ### Moderação: remover posts
 
-- **O autor apaga o próprio post** pelo botão "Apagar meu post", na página do post, e confirma antes. O post sai do feed, do perfil e dos destaques, e ninguém mais curte ou comenta nele. Os pontos que todos já ganharam continuam. O link fica livre para ser divulgado de novo, por exemplo com o título corrigido.
-- **Quem administra remove qualquer post** (spam, link quebrado, fora do tema) pelo botão "Remover post (moderação)". O autor perde os pontos que ganhou com aquele post, e o link continua bloqueado. Quem curtiu ou comentou agiu de boa-fé e mantém os pontos.
+- **O autor apaga o próprio post** pelo botão "Apagar meu post", na página do post, e confirma antes. O post sai do feed, do perfil e dos destaques, e ninguém mais curte ou comenta nele. Os pontos que todos já ganharam continuam. O mesmo link não pode ser divulgado de novo: senão daria para apagar e repostar só para todos pontuarem outra vez pelo mesmo post.
+- **Quem administra remove qualquer post** (spam, link quebrado, fora do tema) pelo botão "Remover post (moderação)". O autor perde os pontos que ganhou com aquele post, e o link também continua bloqueado. Quem curtiu ou comentou agiu de boa-fé e mantém os pontos.
 - O post removido não é apagado do banco: fica guardado quem removeu, quando e por quê. Bancos criados antes desta mudança ganham as colunas novas sozinhos, sem perder dados.
 
 ### Telas (celular e computador)
