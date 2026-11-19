@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react';
-import { api } from './api.js';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { api } from '../api.js';
+import { useSessao } from '../sessao.jsx';
 
 const VAZIO = { nome: '', usuario: '', email: '', senha: '' };
 
@@ -55,7 +57,10 @@ function Campo({ nome, rotulo, erro, dica, ...props }) {
   );
 }
 
-export default function Entrar({ onEntrou }) {
+export default function Entrar() {
+  const { eu, entrou } = useSessao();
+  const navegar = useNavigate();
+  const de = useLocation().state?.de ?? '/';
   const [modo, setModo] = useState('entrar');
   const [campos, setCampos] = useState(VAZIO);
   const [erros, setErros] = useState({});
@@ -64,6 +69,8 @@ export default function Entrar({ onEntrou }) {
   const [verSenha, setVerSenha] = useState(false);
   const form = useRef(null);
   const cadastro = modo === 'cadastro';
+
+  if (eu) return <Navigate to={de} replace />;
 
   function trocarModo(novo) {
     setModo(novo);
@@ -94,7 +101,8 @@ export default function Entrar({ onEntrou }) {
       const u = cadastro
         ? await api('/auth/cadastro', { metodo: 'POST', corpo: campos })
         : await api('/auth/entrar', { metodo: 'POST', corpo: { email: campos.email, senha: campos.senha } });
-      onEntrou(u);
+      entrou(u);
+      navegar(de, { replace: true });
     } catch (err) {
       if (err.campo) {
         setErros({ [err.campo]: err.message });
@@ -110,7 +118,6 @@ export default function Entrar({ onEntrou }) {
   return (
     <div className="entrar">
       <section className="apresentacao">
-        <span className="marca">EngajaDev</span>
         <h1>Seu post de tecnologia merece ser visto.</h1>
         <p>
           A comunidade AceleraDev divulga os próprios posts e apoia os posts dos colegas. Entre para fazer parte.
