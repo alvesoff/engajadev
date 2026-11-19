@@ -14,7 +14,7 @@ São duas pastas separadas. O backend sobe primeiro.
 # backend (API) em http://localhost:4400
 cd backend
 npm install
-npm test                                  # 125 testes automáticos
+npm test                                  # 128 testes automáticos
 DB_PATH=./data/exemplo.db npm run semear  # opcional: dados de exemplo
 DB_PATH=./data/exemplo.db ADMIN_EMAILS=anadev@exemplo.com npm start
 
@@ -34,6 +34,7 @@ As contas de exemplo usam a senha `senha-forte-123`. Com o comando acima, `anade
 - A senha é guardada com **scrypt** (um embaralhamento forte, que não tem volta). A senha nunca sai do servidor.
 - A sessão fica num cookie que o JavaScript da página não consegue ler (`httpOnly`). No banco fica só um código derivado do token, nunca o token.
 - Depois de 5 senhas erradas para o mesmo e-mail, o login dele fica bloqueado por 15 minutos.
+- Um site de fora não consegue curtir, comentar, postar ou resgatar em nome de quem está conectado (proteção contra CSRF). As respostas da API também não ficam guardadas em cache.
 - Todas as mensagens de erro estão em português e apontam o campo errado.
 
 ### Postar e feed
@@ -165,7 +166,7 @@ backend/
     premios.js         catálogo, resgate, entrega e cancelamento (2ª fase)
     semear.js          dados de exemplo (npm run semear)
     rotas/             auth, posts, rankings, carteira, usuarios, regras, premios
-  test/                125 testes automáticos
+  test/                128 testes automáticos
 frontend/
   src/
     App.jsx            menu (embaixo no celular, no topo no computador) e rotas

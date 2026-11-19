@@ -101,3 +101,5 @@ O dia vira à meia-noite de Brasília.
 - Sessão por cookie `httpOnly` e `SameSite=Lax`, válida por 30 dias. No banco fica só o hash do token.
 - Limite de tentativas de login: 5 erros por e-mail ou 50 por IP em 15 minutos bloqueiam até a janela acabar (`429`).
 - E-mail inexistente e senha errada dão a mesma resposta, no mesmo tempo, para não revelar quem tem conta.
+- Pedido que muda dados (POST, PUT, DELETE) vindo de outro site é recusado com `403`. O navegador informa a origem no cabeçalho `Sec-Fetch-Site`. Isso protege contra CSRF, e a tela continua funcionando porque fica no mesmo endereço da API.
+- Toda resposta da API sai com `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: same-origin` e uma `Content-Security-Policy` que não deixa a API abrir dentro de outro site.

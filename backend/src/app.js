@@ -10,6 +10,30 @@ import { rotasRegras } from './rotas/regras.js';
 import { rotasPremios } from './rotas/premios.js';
 import { conferirCooldown, conferirLimitePosts } from './pontos.js';
 
+const METODOS_SEGUROS = new Set(['GET', 'HEAD', 'OPTIONS']);
+
+/**
+ * Proteções de toda a API:
+ * - cabeçalhos de segurança (sem cache de dados pessoais, sem abrir a API dentro de outro site);
+ * - bloqueia pedidos que mudam dados vindos de outro site (CSRF). O navegador diz de onde veio o
+ *   pedido no cabeçalho Sec-Fetch-Site. A tela do EngajaDev fica no mesmo endereço da API, então
+ *   um pedido legítimo é sempre "same-origin" (ou "none", digitado pela pessoa).
+ */
+function protegerApi(req, res, next) {
+  res.set({
+    'Cache-Control': 'no-store',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'Referrer-Policy': 'same-origin',
+    'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'",
+  });
+  const site = req.get('sec-fetch-site');
+  if (!METODOS_SEGUROS.has(req.method) && (site === 'cross-site' || site === 'same-site')) {
+    return next(new ErroHttp(403, 'Pedido bloqueado: ele veio de outro site.'));
+  }
+  next();
+}
+
 /**
  * Monta a aplicação.
  * @param {object} opcoes
@@ -31,6 +55,7 @@ export function criarApp({ db, agora = () => Date.now(), limites, trustProxy = f
   const app = express();
   app.disable('x-powered-by');
   app.set('trust proxy', trustProxy);
+  app.use('/api', protegerApi);
   app.use(express.json({ limit: '10kb' }));
   app.use(carregarSessao(ctx));
 

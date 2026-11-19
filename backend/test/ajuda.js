@@ -27,10 +27,10 @@ export async function criarAmbiente({ limites, regras, inicio, arquivoRegras, ad
   /** Um "navegador": guarda o cookie entre as chamadas. */
   function cliente() {
     let cookie = '';
-    async function req(metodo, caminho, corpo, { cru } = {}) {
+    async function req(metodo, caminho, corpo, { cru, cabecalhos } = {}) {
       const res = await fetch(base + caminho, {
         method: metodo,
-        headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
+        headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}), ...cabecalhos },
         body: cru ?? (corpo === undefined ? undefined : JSON.stringify(corpo)),
       });
       const setCookie = res.headers.get('set-cookie');
@@ -42,10 +42,10 @@ export async function criarAmbiente({ limites, regras, inicio, arquivoRegras, ad
       return { status: res.status, headers: res.headers, setCookie, texto: txt, body: txt ? JSON.parse(txt) : null };
     }
     return {
-      get: (c) => req('GET', c),
+      get: (c, o) => req('GET', c, undefined, o),
       post: (c, b = {}, o) => req('POST', c, b, o),
-      put: (c, b = {}) => req('PUT', c, b),
-      del: (c) => req('DELETE', c),
+      put: (c, b = {}, o) => req('PUT', c, b, o),
+      del: (c, o) => req('DELETE', c, undefined, o),
       get cookie() {
         return cookie;
       },
