@@ -14,7 +14,7 @@ São duas pastas separadas. O backend sobe primeiro.
 # backend (API) em http://localhost:4400
 cd backend
 npm install
-npm test                                  # 124 testes automáticos
+npm test                                  # 125 testes automáticos
 DB_PATH=./data/exemplo.db npm run semear  # opcional: dados de exemplo
 DB_PATH=./data/exemplo.db ADMIN_EMAILS=anadev@exemplo.com npm start
 
@@ -128,7 +128,7 @@ Entrar/criar conta, feed, divulgar post, post (curtir e comentar), rankings, car
 | Funciona bem no celular e no desktop | Prints `computador-*` e `celular-*`, todos conferidos sem rolagem para o lado |
 | Back-end do núcleo entregue antes do capricho visual | Ordem dos commits: todo o backend primeiro, telas depois |
 | Commits granulares + doc do que foi feito | Um commit por etapa (`git log`) e este documento |
-| 2ª fase: pontos viram prêmios | Testes `premios` (resgate, saldo, estoque, gasto duplo, cancelamento, destaque que vence). Prints em `prints/telas-premios/` |
+| 2ª fase: pontos viram prêmios | Testes `premios` (resgate, saldo, estoque, gasto duplo, cancelamento, preço que muda depois, destaque que vence). Prints em `prints/telas-premios/` |
 
 ## Decisões que tomamos (e por quê)
 
@@ -165,7 +165,7 @@ backend/
     premios.js         catálogo, resgate, entrega e cancelamento (2ª fase)
     semear.js          dados de exemplo (npm run semear)
     rotas/             auth, posts, rankings, carteira, usuarios, regras, premios
-  test/                124 testes automáticos
+  test/                125 testes automáticos
 frontend/
   src/
     App.jsx            menu (embaixo no celular, no topo no computador) e rotas

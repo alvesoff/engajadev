@@ -215,6 +215,27 @@ describe('admin entrega ou cancela o resgate', () => {
     }
   });
 
+  test('mudar o preço depois não muda o que já foi resgatado', async () => {
+    const m = await montar({ pontosAna: 10 });
+    try {
+      const caneca = await m.criar({ nome: 'Caneca', custo: 3 });
+      const r = (await m.ana.post(`/api/premios/${caneca.id}/resgatar`)).body.resgate;
+      assert.equal(r.custo, 3);
+
+      const novo = await m.chefe.put(`/api/admin/premios/${caneca.id}`, { custo: 8 });
+      assert.equal(novo.body.custo, 8);
+      const c = await m.ana.get('/api/carteira');
+      assert.equal(c.body.saldo, 7); // continua descontando o preço pago
+      assert.equal(c.body.resgates[0].custo, 3);
+
+      // cancelar devolve o que foi pago, não o preço novo
+      await m.chefe.put(`/api/admin/resgates/${r.id}`, { status: 'cancelado' });
+      assert.equal((await m.ana.get('/api/carteira')).body.saldo, 10);
+    } finally {
+      await m.amb.fechar();
+    }
+  });
+
   test('a lista de resgates de quem não é admin não mostra e-mail', async () => {
     const m = await montar({ pontosAna: 10 });
     try {
