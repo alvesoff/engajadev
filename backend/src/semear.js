@@ -1,5 +1,5 @@
 /**
- * Preenche um banco vazio com dados de exemplo (pessoas, posts, curtidas e comentários),
+ * Preenche um banco vazio com dados de exemplo (pessoas, posts, curtidas, comentários e prêmios),
  * para ver as telas com conteúdo. Uso: npm run semear
  * Todas as contas de exemplo usam a senha "senha-forte-123".
  * Não roda se o banco já tiver contas (para não misturar com dados reais).
@@ -40,6 +40,14 @@ const COMENTARIOS = [
   'Eu passei exatamente por isso semana passada. Valeu por compartilhar!',
   'Ótimo conteúdo. Você pretende fazer uma parte 2?',
   'Direto ao ponto. Mandei para o time inteiro.',
+];
+
+// Catálogo de exemplo: [nome, descrição, custo, estoque (null = sem limite), tipo, dias de destaque]
+const PREMIOS = [
+  ['Adesivos EngajaDev', 'Kit com 5 adesivos para o notebook.', 15, null, 'brinde', null],
+  ['Post em destaque por 3 dias', 'Seu post fica no topo do feed por 3 dias.', 25, null, 'destaque', 3],
+  ['Camiseta EngajaDev', 'Camiseta da comunidade. A organização combina tamanho e entrega por e-mail.', 120, 10, 'brinde', null],
+  ['Mentoria de 30 minutos', 'Conversa com alguém experiente da comunidade sobre carreira ou código.', 200, 3, 'brinde', null],
 ];
 
 // [quem, post, tipo, horas depois do post]
@@ -85,6 +93,13 @@ export async function semear(db, { agora = Date.now() } = {}) {
       return post;
     });
 
+    for (const [nome, descricao, custo, estoque, tipo, dias] of PREMIOS) {
+      db.prepare(
+        `INSERT INTO premios (nome, descricao, custo, estoque, tipo, dias_destaque, ativo, criado_em)
+         VALUES (?, ?, ?, ?, ?, ?, 1, ?)`,
+      ).run(nome, descricao, custo, estoque, tipo, dias, agora - 30 * DIA);
+    }
+
     ACOES.forEach(([quem, p, tipo, depois], i) => {
       const post = posts[p];
       relogio = Math.min(agora - 10 * 60_000, post.criado_em + depois * HORA);
@@ -102,7 +117,7 @@ export async function semear(db, { agora = Date.now() } = {}) {
       }
     });
   });
-  return { pessoas: PESSOAS.length, posts: POSTS.length, acoes: ACOES.length };
+  return { pessoas: PESSOAS.length, posts: POSTS.length, acoes: ACOES.length, premios: PREMIOS.length };
 }
 
 // Rodando direto pelo terminal (npm run semear)
@@ -110,7 +125,7 @@ if (process.argv[1] && import.meta.url.endsWith(process.argv[1].replace(/\\/g, '
   const db = abrirBanco(process.env.DB_PATH || './data/engajadev.db');
   semear(db)
     .then((r) => {
-      console.log(`Pronto: ${r.pessoas} pessoas, ${r.posts} posts e ${r.acoes} curtidas/comentários de exemplo.`);
+      console.log(`Pronto: ${r.pessoas} pessoas, ${r.posts} posts, ${r.acoes} curtidas/comentários e ${r.premios} prêmios de exemplo.`);
       console.log('Entre com qualquer conta, por exemplo anadev@exemplo.com, senha: senha-forte-123');
     })
     .catch((e) => {

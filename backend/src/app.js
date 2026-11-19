@@ -7,6 +7,7 @@ import { rotasRankings } from './rotas/rankings.js';
 import { rotasCarteira } from './rotas/carteira.js';
 import { rotasUsuarios } from './rotas/usuarios.js';
 import { rotasRegras } from './rotas/regras.js';
+import { rotasPremios } from './rotas/premios.js';
 import { conferirCooldown, conferirLimitePosts } from './pontos.js';
 
 /**
@@ -39,6 +40,7 @@ export function criarApp({ db, agora = () => Date.now(), limites, trustProxy = f
   app.use('/api/carteira', rotasCarteira(ctx));
   app.use('/api/usuarios', rotasUsuarios(ctx));
   app.use('/api', rotasRegras(ctx));
+  app.use('/api', rotasPremios(ctx));
   app.use('/api', (_req, _res, next) => next(new ErroHttp(404, 'Rota não encontrada.')));
 
   // eslint-disable-next-line no-unused-vars

@@ -1,6 +1,6 @@
 # EngajaDev: backend
 
-API do EngajaDev: contas, posts, curtidas, comentários e pontos. Node.js + Express + SQLite nativo do Node (`node:sqlite`), sem banco externo para instalar.
+API do EngajaDev: contas, posts, curtidas, comentários, pontos, rankings, carteira e prêmios. Node.js + Express + SQLite nativo do Node (`node:sqlite`), sem banco externo para instalar.
 
 ## Requisitos
 
@@ -17,7 +17,7 @@ npm start              # API em http://localhost:4400
 
 `npm run dev` reinicia sozinho quando um arquivo muda. O banco é criado em `data/engajadev.db` (fora do git).
 
-Para ter dados de exemplo (6 pessoas, 8 posts, curtidas e comentários) num banco vazio: `DB_PATH=./data/exemplo.db npm run semear`. As contas de exemplo usam a senha `senha-forte-123`.
+Para ter dados de exemplo (6 pessoas, 8 posts, curtidas, comentários e 4 prêmios) num banco vazio: `DB_PATH=./data/exemplo.db npm run semear`. As contas de exemplo usam a senha `senha-forte-123`.
 
 ## Testes
 
@@ -58,6 +58,21 @@ Todas recebem e devolvem JSON. Em erro, a resposta é `{ "erro": "mensagem em po
 | `GET` | `/api/regras` | Regras em vigor (pública, usada na tela "Como pontuar") |
 | `GET` | `/api/admin/regras` | Cada regra com valor, faixa e de onde veio. Só admin |
 | `PUT` | `/api/admin/regras` | Muda regras: `{ "pontos.curtir": 2 }`. `null` volta ao arquivo ou ao padrão. Só admin |
+| `GET` | `/api/premios` | Catálogo de prêmios ativos (público) |
+| `POST` | `/api/premios/:id/resgatar` | Troca pontos da carteira por um prêmio. Destaque pede `postId` (post seu) |
+| `GET` | `/api/admin/premios` | Todos os prêmios, inclusive desativados. Só admin |
+| `POST` | `/api/admin/premios` | Cria prêmio (`nome`, `descricao`, `custo`, `estoque`, `tipo`, `diasDestaque`, `ativo`). Só admin |
+| `PUT` | `/api/admin/premios/:id` | Edita ou desativa um prêmio. Só admin |
+| `GET` | `/api/admin/resgates?status=pendente` | Resgates, com o e-mail de quem resgatou para combinar a entrega. Só admin |
+| `PUT` | `/api/admin/resgates/:id` | Marca `{ "status": "entregue" }` ou `"cancelado"` (devolve pontos e estoque). Só admin |
+
+## Prêmios (2ª fase)
+
+- O admin monta o catálogo: **brindes** (entregues pela organização) e **destaque** (o post da pessoa fica no topo do feed por alguns dias).
+- Resgatar desconta da carteira na hora: `saldo = tudo o que ganhou − resgates não cancelados`. Resgatar **não** muda rankings, perfil nem o limite de pontos de hoje.
+- Brinde fica `pendente` até o admin marcar `entregue`. Cancelar devolve os pontos e o estoque uma vez só.
+- Saldo, estoque e resgate são conferidos e gravados juntos, então não dá para gastar os mesmos pontos duas vezes.
+- O feed traz os posts em destaque à parte (`destaques`), só na primeira página.
 
 ## Tudo configurável
 
