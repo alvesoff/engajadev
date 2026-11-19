@@ -1,5 +1,7 @@
 # Proposta: estrutura e telas do EngajaDev
 
+O que foi entregue está explicado em [o-que-foi-feito.md](o-que-foi-feito.md).
+
 Este documento mostra como o EngajaDev vai ser montado: as pastas, as tabelas do banco, as rotas da API e as telas. Ele parte da visão do [README](../README.md) e das [discussões](https://github.com/alvesoff/engajadev/discussions). É uma proposta: a comunidade pode mudar qualquer parte.
 
 ## A ideia em uma linha
@@ -89,15 +91,15 @@ Os rankings e a carteira são somas da tabela `lancamentos`. Nada é apagado na 
 | POST | `/api/auth/entrar` | entra com e-mail e senha | **pronta** |
 | POST | `/api/auth/sair` | sai | **pronta** |
 | GET | `/api/auth/eu` | diz quem está conectado | **pronta** |
-| GET | `/api/posts` | feed, do mais novo para o mais antigo | a fazer |
-| POST | `/api/posts` | publica um link | a fazer |
-| GET | `/api/posts/:id` | um post com os comentários | a fazer |
-| POST / DELETE | `/api/posts/:id/curtida` | curte e descurte | a fazer |
-| POST | `/api/posts/:id/comentarios` | comenta | a fazer |
-| GET | `/api/rankings?periodo=semana\|geral&tipo=engajador\|criador` | rankings | a fazer |
-| GET | `/api/carteira` | saldo e extrato de pontos | a fazer |
-| GET | `/api/usuarios/:usuario` | perfil público | a fazer |
-| GET | `/api/regras` | regras de pontos em vigor | a fazer |
+| GET | `/api/posts` | feed, do mais novo para o mais antigo | **pronta** |
+| POST | `/api/posts` | publica um link | **pronta** |
+| GET | `/api/posts/:id` | um post com os comentários | **pronta** |
+| POST / DELETE | `/api/posts/:id/curtida` | curte e descurte | **pronta** |
+| POST | `/api/posts/:id/comentarios` | comenta | **pronta** |
+| GET | `/api/rankings?periodo=semana\|geral&tipo=engajador\|criador` | rankings | **pronta** |
+| GET | `/api/carteira` | saldo e extrato de pontos | **pronta** |
+| GET | `/api/usuarios/:usuario` | perfil público | **pronta** |
+| GET | `/api/regras` | regras de pontos em vigor | **pronta** |
 
 ## Telas
 
@@ -106,26 +108,26 @@ Todas funcionam no celular e no computador. No celular, um menu fixo embaixo. No
 | Tela | O que mostra | Situação |
 | --- | --- | --- |
 | **Entrar / Criar conta** | formulário com as duas opções | **pronta** |
-| **Olá** | página simples depois de entrar, com o botão Sair | **pronta** (vira o Feed depois) |
-| **Feed** | posts da comunidade, com rede, título, autor, curtidas e comentários | a fazer |
-| **Postar** | link, título e descrição | a fazer |
-| **Post** | o post, o botão para abrir o original, curtir e comentar, e os pontos ganhos | a fazer |
-| **Rankings** | Top da Semana (Engajador e Criador) e Top Geral | a fazer |
-| **Carteira** | saldo de pontos, pontos de hoje e extrato | a fazer |
-| **Perfil público** | nome, @usuário, posts, pontos e posição no ranking | a fazer |
-| **Como pontuar** | as regras de pontos em vigor | a fazer |
+| **Olá** | página simples depois de entrar, com o botão Sair | virou o Feed, que agora diz "Olá, <nome>" |
+| **Feed** | posts da comunidade, com rede, título, autor, curtidas e comentários | **pronta** |
+| **Postar** | link, título e descrição | **pronta** |
+| **Post** | o post, o botão para abrir o original, curtir e comentar, e os pontos ganhos | **pronta** |
+| **Rankings** | Top da Semana (Engajador e Criador) e Top Geral | **pronta** |
+| **Carteira** | saldo de pontos, pontos de hoje e extrato | **pronta** |
+| **Perfil público** | nome, @usuário, posts, pontos e posição no ranking | **pronta** |
+| **Como pontuar** | as regras de pontos em vigor | **pronta** |
 
 ## Ordem de entrega
 
 - Login (backend e tela). **Feito.**
 - Esta proposta. **Feito.**
-- Núcleo do backend: postar link, feed, curtir, comentar e o motor de pontos.
-- Rankings: Top da Semana e Top Geral.
-- Carteira de pontos.
-- Contra trapaça.
-- Perfil público.
-- Regras configuráveis.
-- Telas de tudo acima.
+- Núcleo do backend: postar link, feed, curtir, comentar e o motor de pontos. **Feito.**
+- Rankings: Top da Semana e Top Geral. **Feito.**
+- Carteira de pontos. **Feito.**
+- Contra trapaça. **Feito.**
+- Perfil público. **Feito.**
+- Regras configuráveis. **Feito.**
+- Telas de tudo acima. **Feito.**
 
 Em cada passo, o backend vem antes da tela.
 
