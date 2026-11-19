@@ -8,7 +8,7 @@ export const DIA = 24 * HORA;
 export const QUINTA_MEIO_DIA = Date.UTC(2026, 10, 19, 15, 0, 0);
 
 /** Sobe a API numa porta livre, com banco em memória e relógio controlado. */
-export async function criarAmbiente({ limites, regras, inicio } = {}) {
+export async function criarAmbiente({ limites, regras, inicio, arquivoRegras, admins } = {}) {
   const relogio = {
     agora: inicio ?? QUINTA_MEIO_DIA,
     avancar(ms) {
@@ -18,7 +18,7 @@ export async function criarAmbiente({ limites, regras, inicio } = {}) {
   const db = abrirBanco(':memory:');
   // Nos testes o cooldown fica desligado, a não ser que o teste peça.
   const regrasTeste = { ...regras, limites: { cooldownSegundos: 0, ...regras?.limites } };
-  const app = criarApp({ db, agora: () => relogio.agora, limites, regras: regrasTeste });
+  const app = criarApp({ db, agora: () => relogio.agora, limites, regras: regrasTeste, arquivoRegras, admins });
   const servidor = await new Promise((ok) => {
     const s = app.listen(0, '127.0.0.1', () => ok(s));
   });

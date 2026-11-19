@@ -30,6 +30,8 @@ npm test
 | `PORT` | `4400` | Porta da API |
 | `DB_PATH` | `./data/engajadev.db` | Arquivo do banco SQLite |
 | `NODE_ENV` | `development` | Em `production` o cookie sai com `Secure` (só HTTPS) |
+| `REGRAS_PATH` | `./config/regras.json` | Arquivo com as regras do jogo |
+| `ADMIN_EMAILS` | vazio | E-mails de quem administra, separados por vírgula. Só essas pessoas mudam as regras pela tela de admin |
 | `TRUST_PROXY` | desligado | Número de proxies na frente da API (ex.: `1`), para o limite por IP ver o IP real |
 
 ## Rotas
@@ -51,8 +53,20 @@ Todas recebem e devolvem JSON. Em erro, a resposta é `{ "erro": "mensagem em po
 | `GET` | `/api/rankings?periodo=semana\|geral&tipo=engajador\|criador` | Top da Semana (zera toda segunda 00:00 de Brasília) ou Top Geral (só quem tem 10 pontos ou mais) |
 | `GET` | `/api/carteira` | Carteira de pontos de prêmio: saldo de sempre, pontos da semana e de hoje, e extrato |
 | `GET` | `/api/usuarios/:usuario` | Perfil público: posts, pontos e posição nos rankings (sem e-mail) |
+| `GET` | `/api/regras` | Regras em vigor (pública, usada na tela "Como pontuar") |
+| `GET` | `/api/admin/regras` | Cada regra com valor, faixa e de onde veio. Só admin |
+| `PUT` | `/api/admin/regras` | Muda regras: `{ "pontos.curtir": 2 }`. `null` volta ao arquivo ou ao padrão. Só admin |
+
+## Tudo configurável
+
+Pontos por ação, limites diários, cooldown, limiar do Top Geral e virada da semana ficam em [`config/regras.json`](config/regras.json). Basta mudar o arquivo: vale na próxima ação, sem reiniciar e sem mexer no código. Quem está em `ADMIN_EMAILS` também pode mudar tudo pela tela de admin, que grava no banco e vale por cima do arquivo.
+
+Ordem de prioridade: **tela de admin > arquivo > padrão do código**. Valor fora da faixa é recusado com uma mensagem clara.
 
 ## Regras contra trapaça (anti-gaming)
+
+Valores padrão (todos mudam no arquivo de regras ou na tela de admin):
+
 
 - **Limite diário de pontos:** até 30 pontos por dia como engajador e 60 como criador. Passou do limite, a ação acontece, mas não pontua.
 - **Cooldown:** 10 segundos entre duas curtidas ou comentários da mesma pessoa (`429` com o tempo que falta).

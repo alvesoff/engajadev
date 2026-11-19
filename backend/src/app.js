@@ -6,6 +6,7 @@ import { rotasPosts } from './rotas/posts.js';
 import { rotasRankings } from './rotas/rankings.js';
 import { rotasCarteira } from './rotas/carteira.js';
 import { rotasUsuarios } from './rotas/usuarios.js';
+import { rotasRegras } from './rotas/regras.js';
 import { conferirCooldown, conferirLimitePosts } from './pontos.js';
 
 /**
@@ -16,9 +17,13 @@ import { conferirCooldown, conferirLimitePosts } from './pontos.js';
  * @param {object} [opcoes.limites] limite de tentativas de login { porEmail, porIp, janelaMs }
  * @param {boolean|string|number} [opcoes.trustProxy] valor do "trust proxy" do Express
  * @param {object} [opcoes.regras] regras que valem por cima do padrão (usado nos testes)
+ * @param {string} [opcoes.arquivoRegras] caminho do config/regras.json
+ * @param {string[]} [opcoes.admins] e-mails de quem administra (pode mudar as regras)
  */
-export function criarApp({ db, agora = () => Date.now(), limites, trustProxy = false, regras } = {}) {
-  const ctx = { db, agora, regras: criarLeitorRegras({ extra: regras }) };
+export function criarApp({ db, agora = () => Date.now(), limites, trustProxy = false, regras, arquivoRegras, admins = [] } = {}) {
+  const listaAdmins = admins.map((e) => String(e).trim().toLowerCase()).filter(Boolean);
+  const ctx = { db, agora, regras: criarLeitorRegras({ arquivo: arquivoRegras, db, extra: regras }) };
+  ctx.ehAdmin = (u) => Boolean(u && listaAdmins.includes(String(u.email).toLowerCase()));
   ctx.antesDeEngajar = (usuario) => conferirCooldown(ctx, usuario.id);
   ctx.antesDePostar = (usuario) => conferirLimitePosts(ctx, usuario.id);
 
@@ -33,6 +38,7 @@ export function criarApp({ db, agora = () => Date.now(), limites, trustProxy = f
   app.use('/api/rankings', rotasRankings(ctx));
   app.use('/api/carteira', rotasCarteira(ctx));
   app.use('/api/usuarios', rotasUsuarios(ctx));
+  app.use('/api', rotasRegras(ctx));
   app.use('/api', (_req, _res, next) => next(new ErroHttp(404, 'Rota não encontrada.')));
 
   // eslint-disable-next-line no-unused-vars

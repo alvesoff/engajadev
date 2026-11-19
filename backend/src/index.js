@@ -12,8 +12,11 @@ function lerTrustProxy(valor) {
 }
 const trustProxy = lerTrustProxy(process.env.TRUST_PROXY);
 
+const arquivoRegras = process.env.REGRAS_PATH || './config/regras.json';
+const admins = (process.env.ADMIN_EMAILS ?? '').split(',');
+
 const db = abrirBanco(caminhoBanco);
-const app = criarApp({ db, trustProxy });
+const app = criarApp({ db, trustProxy, arquivoRegras, admins });
 
 app.listen(porta, () => {
   console.log(`EngajaDev API em http://localhost:${porta}`);

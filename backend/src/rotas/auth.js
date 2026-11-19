@@ -105,6 +105,8 @@ function validarCadastro(corpo) {
  */
 export function rotasAuth(ctx, { porEmail = 5, porIp = 50, janelaMs = 15 * MIN } = {}) {
   const r = Router();
+  // O que a própria pessoa vê sobre si: os dados públicos, o e-mail e se ela administra.
+  const eu = (u) => ({ ...usuarioPublico(u), admin: Boolean(ctx.ehAdmin?.(u)) });
   const limiteEmail = criarLimitador({ maximo: porEmail, janelaMs, agora: ctx.agora });
   const limiteIp = criarLimitador({ maximo: porIp, janelaMs, agora: ctx.agora });
 
@@ -121,7 +123,7 @@ export function rotasAuth(ctx, { porEmail = 5, porIp = 50, janelaMs = 15 * MIN }
       .run(nome, usuario, email, senhaHash, ctx.agora());
     criarSessao(ctx, res, Number(lastInsertRowid));
     const u = ctx.db.prepare('SELECT * FROM usuarios WHERE id = ?').get(lastInsertRowid);
-    res.status(201).json(usuarioPublico(u));
+    res.status(201).json(eu(u));
   });
 
   r.post('/entrar', async (req, res) => {
@@ -150,7 +152,7 @@ export function rotasAuth(ctx, { porEmail = 5, porIp = 50, janelaMs = 15 * MIN }
     }
     limiteEmail.limpar(chaveEmail);
     criarSessao(ctx, res, u.id);
-    res.json(usuarioPublico(u));
+    res.json(eu(u));
   });
 
   r.post('/sair', (req, res) => {
@@ -160,7 +162,7 @@ export function rotasAuth(ctx, { porEmail = 5, porIp = 50, janelaMs = 15 * MIN }
     res.status(204).end();
   });
 
-  r.get('/eu', exigirLogin, (req, res) => res.json(usuarioPublico(req.usuario)));
+  r.get('/eu', exigirLogin, (req, res) => res.json(eu(req.usuario)));
 
   return r;
 }

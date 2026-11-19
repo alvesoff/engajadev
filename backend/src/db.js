@@ -69,6 +69,14 @@ CREATE TABLE IF NOT EXISTS lancamentos (
 CREATE INDEX IF NOT EXISTS lanc_usuario_tempo ON lancamentos(usuario_id, papel, criado_em);
 CREATE INDEX IF NOT EXISTS lanc_papel_tempo ON lancamentos(papel, criado_em);
 CREATE INDEX IF NOT EXISTS lanc_ref ON lancamentos(ref_tipo, ref_id);
+
+-- Regras mudadas pela tela de admin. Valem por cima do config/regras.json.
+CREATE TABLE IF NOT EXISTS regras_override (
+  chave TEXT PRIMARY KEY,
+  valor INTEGER NOT NULL,
+  alterado_por INTEGER REFERENCES usuarios(id) ON DELETE SET NULL,
+  alterado_em INTEGER NOT NULL
+);
 `;
 
 export function abrirBanco(caminho = ':memory:') {
