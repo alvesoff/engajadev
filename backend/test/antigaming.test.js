@@ -154,3 +154,49 @@ describe('anti-gaming', () => {
       assert.equal((await ana.post('/api/posts', { url: 'https://dev.to/ana/sexto', titulo: 'Sexto post' })).status, 201);
     }));
 });
+
+describe('limite de contas novas por IP', () => {
+  const dados = (n) => ({ nome: `Pessoa ${n}`, usuario: `pessoa${n}`, email: `pessoa${n}@exemplo.com`, senha: 'senha-forte-123' });
+
+  test('passou do limite na hora: 429 com espera; depois de uma hora libera', async () => {
+    const amb = await criarAmbiente({ regras: { limites: { cadastrosPorIpHora: 3 } } });
+    try {
+      for (let i = 1; i <= 3; i++) assert.equal((await amb.cliente().post('/api/auth/cadastro', dados(i))).status, 201);
+      const r = await amb.cliente().post('/api/auth/cadastro', dados(4));
+      assert.equal(r.status, 429);
+      assert.equal(r.body.erro, 'Muitas contas criadas a partir desta rede. Espere 60 minutos e tente de novo.');
+      assert.equal(r.headers.get('retry-after'), '3600');
+      assert.equal(amb.db.prepare('SELECT COUNT(*) AS n FROM usuarios').get().n, 3);
+
+      amb.relogio.avancar(HORA);
+      assert.equal((await amb.cliente().post('/api/auth/cadastro', dados(4))).status, 201);
+    } finally {
+      await amb.fechar();
+    }
+  });
+
+  test('cadastro recusado (e-mail repetido) não gasta vaga; pedidos ao mesmo tempo não passam do limite', async () => {
+    const amb = await criarAmbiente({ regras: { limites: { cadastrosPorIpHora: 2 } } });
+    try {
+      assert.equal((await amb.cliente().post('/api/auth/cadastro', dados(1))).status, 201);
+      for (let i = 0; i < 3; i++) assert.equal((await amb.cliente().post('/api/auth/cadastro', dados(1))).status, 409);
+      const juntos = await Promise.all([2, 3, 4].map((n) => amb.cliente().post('/api/auth/cadastro', dados(n))));
+      assert.deepEqual(juntos.map((r) => r.status).sort(), [201, 429, 429]);
+      assert.equal(amb.db.prepare('SELECT COUNT(*) AS n FROM usuarios').get().n, 2);
+    } finally {
+      await amb.fechar();
+    }
+  });
+
+  test('0 = sem limite, e o admin muda o limite pela tela de regras', async () => {
+    const amb = await criarAmbiente({ admins: ['chefe@exemplo.com'] });
+    try {
+      for (let i = 1; i <= 12; i++) assert.equal((await amb.cliente().post('/api/auth/cadastro', dados(i))).status, 201);
+      const chefe = await amb.pessoa('chefe');
+      assert.equal((await chefe.put('/api/admin/regras', { 'limites.cadastrosPorIpHora': 1 })).status, 200);
+      assert.equal((await amb.cliente().post('/api/auth/cadastro', dados(99))).status, 429);
+    } finally {
+      await amb.fechar();
+    }
+  });
+});

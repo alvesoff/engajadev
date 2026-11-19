@@ -16,8 +16,8 @@ export async function criarAmbiente({ limites, regras, inicio, arquivoRegras, ad
     },
   };
   const db = abrirBanco(':memory:');
-  // Nos testes o cooldown fica desligado, a não ser que o teste peça.
-  const regrasTeste = { ...regras, limites: { cooldownSegundos: 0, ...regras?.limites } };
+  // Nos testes o cooldown e o limite de cadastros ficam desligados, a não ser que o teste peça.
+  const regrasTeste = { ...regras, limites: { cooldownSegundos: 0, cadastrosPorIpHora: 0, ...regras?.limites } };
   const app = criarApp({ db, agora: () => relogio.agora, limites, regras: regrasTeste, arquivoRegras, admins });
   const servidor = await new Promise((ok) => {
     const s = app.listen(0, '127.0.0.1', () => ok(s));
