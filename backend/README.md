@@ -49,6 +49,7 @@ Todas recebem e devolvem JSON. Em erro, a resposta é `{ "erro": "mensagem em po
 | `DELETE` | `/api/posts/:id/curtida` | Descurte e devolve os pontos daquela curtida |
 | `POST` | `/api/posts/:id/comentarios` | Comenta (`texto`). Devolve os pontos ganhos |
 | `GET` | `/api/rankings?periodo=semana\|geral&tipo=engajador\|criador` | Top da Semana (zera toda segunda 00:00 de Brasília) ou Top Geral (só quem tem 10 pontos ou mais) |
+| `GET` | `/api/carteira` | Carteira de pontos de prêmio: saldo de sempre, pontos da semana e de hoje, e extrato |
 
 ## Segurança
 
