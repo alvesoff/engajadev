@@ -127,6 +127,7 @@ function migrar(db) {
   // Moderação: post removido some do site, mas a linha fica (histórico e estorno de pontos).
   if (!posts.has('removido_em')) db.exec('ALTER TABLE posts ADD COLUMN removido_em INTEGER');
   if (!posts.has('removido_por')) db.exec('ALTER TABLE posts ADD COLUMN removido_por INTEGER REFERENCES usuarios(id) ON DELETE SET NULL');
+  if (!posts.has('editado_em')) db.exec('ALTER TABLE posts ADD COLUMN editado_em INTEGER');
   if (!posts.has('removido_motivo')) db.exec("ALTER TABLE posts ADD COLUMN removido_motivo TEXT CHECK (removido_motivo IN ('autor', 'moderacao'))");
 }
 

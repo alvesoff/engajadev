@@ -14,7 +14,7 @@ São duas pastas separadas. O backend sobe primeiro.
 # backend (API) em http://localhost:4400
 cd backend
 npm install
-npm test                                  # 136 testes automáticos
+npm test                                  # 140 testes automáticos
 DB_PATH=./data/exemplo.db npm run semear  # opcional: dados de exemplo
 DB_PATH=./data/exemplo.db ADMIN_EMAILS=anadev@exemplo.com npm start
 
@@ -112,6 +112,12 @@ As contas de exemplo usam a senha `senha-forte-123`. Com o comando acima, `anade
 - **Destaque:** a pessoa escolhe um post dela. Ele aparece em "Em destaque" no topo do feed até o prazo acabar e depois sai sozinho.
 - A carteira mostra "Meus resgates", com a situação de cada um.
 
+### Editar o próprio post
+
+- Na página do post, o autor usa "Editar" para corrigir o título e a descrição. Curtidas, comentários e pontos continuam iguais, e o post passa a mostrar "editado".
+- **O link não muda.** Ele identifica o post: trocar o link seria divulgar outro conteúdo aproveitando as curtidas deste. Para outro link, a pessoa publica um post novo.
+- Só o autor edita. Quem administra modera removendo o post, não mudando o que a pessoa escreveu.
+
 ### Moderação: remover posts
 
 - **O autor apaga o próprio post** pelo botão "Apagar meu post", na página do post, e confirma antes. O post sai do feed, do perfil e dos destaques, e ninguém mais curte ou comenta nele. Os pontos que todos já ganharam continuam. O mesmo link não pode ser divulgado de novo: senão daria para apagar e repostar só para todos pontuarem outra vez pelo mesmo post.
@@ -174,7 +180,7 @@ backend/
     premios.js         catálogo, resgate, entrega e cancelamento (2ª fase)
     semear.js          dados de exemplo (npm run semear)
     rotas/             auth, posts, rankings, carteira, usuarios, regras, premios
-  test/                136 testes automáticos
+  test/                140 testes automáticos
 frontend/
   src/
     App.jsx            menu (embaixo no celular, no topo no computador) e rotas
