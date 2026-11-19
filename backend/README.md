@@ -50,6 +50,7 @@ Todas recebem e devolvem JSON. Em erro, a resposta é `{ "erro": "mensagem em po
 | `POST` | `/api/posts/:id/comentarios` | Comenta (`texto`). Devolve os pontos ganhos |
 | `GET` | `/api/rankings?periodo=semana\|geral&tipo=engajador\|criador` | Top da Semana (zera toda segunda 00:00 de Brasília) ou Top Geral (só quem tem 10 pontos ou mais) |
 | `GET` | `/api/carteira` | Carteira de pontos de prêmio: saldo de sempre, pontos da semana e de hoje, e extrato |
+| `GET` | `/api/usuarios/:usuario` | Perfil público: posts, pontos e posição nos rankings (sem e-mail) |
 
 ## Regras contra trapaça (anti-gaming)
 
