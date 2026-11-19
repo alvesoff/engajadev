@@ -1,0 +1,32 @@
+{
+  "pontos": {
+    "curtir": 1,
+    "comentar": 3,
+    "curtidaRecebida": 1,
+    "comentarioRecebido": 2,
+    "publicarPost": 0
+  },
+  "limites": {
+    "pontosDiariosEngajador": 30,
+    "pontosDiariosCriador": 60,
+    "cooldownSegundos": 10,
+    "comentarioMinCaracteres": 20,
+    "comentariosPontuadosPorPost": 1,
+    "postsPorDia": 5,
+    "cadastrosPorIpHora": 10
+  },
+  "ranking": {
+    "limiarTopGeral": 10,
+    "tamanho": 50
+  },
+  "periodo": {
+    "inicioSemanaDia": 1,
+    "inicioSemanaHora": 0,
+    "fusoHorarioMinutos": -180
+  },
+  "texto": {
+    "tituloMax": 120,
+    "descricaoMax": 500,
+    "comentarioMax": 1000
+  }
+}
