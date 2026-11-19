@@ -88,8 +88,9 @@ export default function Post() {
         </a>
         <footer className="post-acoes">
           <BotaoCurtir post={post} aoMudar={(p) => setDados((d) => ({ ...d, post: p }))} />
-          <span className="acao estatica" aria-label={`${post.comentarios} comentários`}>
-            <Icone nome="comentario" /> <span aria-hidden="true">{post.comentarios}</span>
+          <span className="acao estatica">
+            <Icone nome="comentario" /> {post.comentarios}
+            <span className="so-leitor"> {post.comentarios === 1 ? 'comentário' : 'comentários'}</span>
           </span>
         </footer>
       </article>

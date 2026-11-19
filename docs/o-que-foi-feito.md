@@ -118,6 +118,7 @@ Entrar/criar conta, feed, divulgar post, post (curtir e comentar), rankings, car
 - **Celular:** menu fixo embaixo (Feed, Rankings, Postar, Carteira, Perfil), botões grandes para o dedo e campos com letra de 16px (o iPhone não dá zoom sozinho).
 - **Computador:** menu no topo, saldo e botão "Postar" sempre à mão e o Top da Semana numa coluna ao lado.
 - Funciona no modo escuro do sistema.
+- **Acessibilidade:** todas as telas passam no verificador automático axe (regras WCAG 2.1 AA), no tema claro e no escuro, no celular e no computador. Textos e selos têm contraste de pelo menos 4,5:1, links no meio do texto são sublinhados, os títulos seguem a ordem certa, dá para navegar só com o teclado (foco visível e atalho "Pular para o conteúdo") e os números de curtidas e comentários são lidos com o nome pelo leitor de tela.
 
 ## Critério de pronto, item por item
 
