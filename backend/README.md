@@ -17,6 +17,8 @@ npm start              # API em http://localhost:4400
 
 `npm run dev` reinicia sozinho quando um arquivo muda. O banco é criado em `data/engajadev.db` (fora do git).
 
+Para ter dados de exemplo (6 pessoas, 8 posts, curtidas e comentários) num banco vazio: `DB_PATH=./data/exemplo.db npm run semear`. As contas de exemplo usam a senha `senha-forte-123`.
+
 ## Testes
 
 ```bash
