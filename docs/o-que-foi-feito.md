@@ -108,7 +108,7 @@ Entrar/criar conta, feed, divulgar post, post (curtir e comentar), rankings, car
 | Critério | Como conferir |
 | --- | --- |
 | Cadastrar/logar, postar link, curtir e comentar, e os pontos somam certo | Testes `auth`, `nucleo` e `carteira`. Prints `03` a `05` |
-| Rankings aparecem e atualizam; o Top da Semana zera; o Top Geral ignora quem tem menos de 10 | Testes `rankings` (virada da semana minuto a minuto e limiar). Prints `07` e `08` |
+| Rankings aparecem e atualizam; o Top da Semana zera; o Top Geral ignora quem tem menos de 10 | Testes `rankings` (virada da semana minuto a minuto e limiar). Com a tela aberta, o ranking e o Top da Semana ao lado se atualizam sozinhos a cada 30 segundos e quando a pessoa volta para a aba. Prints `07` e `08` |
 | Pontuação, limites, cooldown e limiar configuráveis sem mexer no código | Testes `configuravel` (arquivo e admin). Print `12` |
 | Funciona bem no celular e no desktop | Prints `computador-*` e `celular-*`, todos conferidos sem rolagem para o lado |
 | Back-end do núcleo entregue antes do capricho visual | Ordem dos commits: todo o backend primeiro, telas depois |

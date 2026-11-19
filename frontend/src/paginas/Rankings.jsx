@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../api.js';
 import { useSessao } from '../sessao.jsx';
 import Avatar from '../componentes/Avatar.jsx';
+import { useAtualizar } from '../useAtualizar.js';
 
 const TIPOS = {
   engajador: { nome: 'Top Engajador', ajuda: 'Quem mais apoia: pontos de curtir e comentar.' },
@@ -28,12 +29,23 @@ export default function Rankings() {
   const [erro, setErro] = useState('');
 
   useEffect(() => {
+    let valendo = true;
     setDados(null);
     setErro('');
     api(`/rankings?periodo=${periodo}&tipo=${tipo}`)
-      .then(setDados)
-      .catch((e) => setErro(e.message));
+      .then((d) => valendo && setDados(d))
+      .catch((e) => valendo && setErro(e.message));
+    return () => {
+      valendo = false;
+    };
   }, [tipo, periodo]);
+
+  // Com a tela aberta, o ranking se atualiza sozinho (sem piscar a lista).
+  useAtualizar(() => {
+    api(`/rankings?periodo=${periodo}&tipo=${tipo}`)
+      .then((d) => setDados((atual) => (atual && atual.tipo === d.tipo && atual.periodo === d.periodo ? d : atual)))
+      .catch(() => {});
+  });
 
   const podio = dados?.pessoas.slice(0, 3) ?? [];
   const resto = dados?.pessoas.slice(3) ?? [];

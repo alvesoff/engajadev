@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, Link, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { useSessao } from './sessao.jsx';
 import { api } from './api.js';
+import { useAtualizar } from './useAtualizar.js';
 import Icone from './componentes/Icone.jsx';
 import Avatar from './componentes/Avatar.jsx';
 import Entrar from './paginas/Entrar.jsx';
@@ -31,6 +32,11 @@ function TopDaSemanaLateral() {
       .then(setDados)
       .catch(() => setDados({ pessoas: [] }));
   }, [loc.pathname, saldo]);
+  useAtualizar(() => {
+    api('/rankings?periodo=semana&tipo=engajador')
+      .then(setDados)
+      .catch(() => {});
+  });
   return (
     <section className="card lateral-bloco">
       <h2>Top Engajador da semana</h2>
