@@ -133,7 +133,7 @@ Em cada passo, o backend vem antes da tela.
 
 ## Fica para depois
 
-- Catálogo e resgate de prêmios.
+- ~~Catálogo e resgate de prêmios.~~ **Feito na 2ª fase** (veja [o-que-foi-feito.md](o-que-foi-feito.md)).
 - Recuperar senha por e-mail e entrar com Google ou GitHub.
 - Moderação (denunciar e apagar posts e comentários).
 - Integração com as APIs das redes.
