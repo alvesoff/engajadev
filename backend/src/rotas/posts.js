@@ -5,6 +5,7 @@ import { analisarLink, NOMES_REDES } from '../redes.js';
 import { exigirLogin } from './auth.js';
 import { pontuarCurtida, pontuarComentario, pontuarPublicacao, estornar } from '../pontos.js';
 import { idsEmDestaque } from '../premios.js';
+import { resolverDenuncias } from '../denuncias.js';
 
 const texto = (v) => (typeof v === 'string' ? v.trim() : '');
 
@@ -224,6 +225,7 @@ export function rotasPosts(ctx) {
           'UPDATE posts SET removido_em = ?, removido_por = ?, removido_motivo = ? WHERE id = ?',
         )
         .run(ctx.agora(), req.usuario.id, motivo, post.id);
+      resolverDenuncias(ctx, post.id, { por: req.usuario.id, resultado: 'removido' });
       if (motivo === 'autor') return 0;
       return Number(ctx.db.prepare('DELETE FROM lancamentos WHERE post_id = ? AND usuario_id = ?').run(post.id, post.usuario_id).changes);
     });

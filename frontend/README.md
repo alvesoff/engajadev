@@ -35,6 +35,7 @@ Para ver as telas com conteúdo, rode antes no backend `DB_PATH=./data/exemplo.d
 | `/como-pontuar` | Regras em vigor, lidas do backend |
 | `/admin/regras` | Mudar as regras (só para quem está em `ADMIN_EMAILS` no backend) |
 | `/premios` | Catálogo de prêmios: trocar pontos da carteira por brindes ou por destaque do próprio post |
+| `/admin/denuncias` | Fila de posts denunciados: manter ou remover (só admin) |
 | `/admin/premios` | Montar o catálogo e marcar resgates como entregues ou cancelados (só admin) |
 
 ## Build

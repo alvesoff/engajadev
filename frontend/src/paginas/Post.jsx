@@ -5,6 +5,7 @@ import { useSessao } from '../sessao.jsx';
 import Avatar from '../componentes/Avatar.jsx';
 import Icone from '../componentes/Icone.jsx';
 import { BotaoCurtir, SeloRede } from '../componentes/CardPost.jsx';
+import Denunciar from '../componentes/Denunciar.jsx';
 
 /** Formulário para o autor corrigir título e descrição. O link não muda. */
 function EditarPost({ post, texto, aoSalvar, aoCancelar }) {
@@ -234,6 +235,11 @@ export default function Post() {
                 </button>
               </>
             )}
+          </div>
+        )}
+        {eu && !proprio && !eu.admin && (
+          <div className="remover-post">
+            <Denunciar postId={post.id} />
           </div>
         )}
       </article>

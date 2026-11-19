@@ -53,6 +53,10 @@ Todas recebem e devolvem JSON. Em erro, a resposta é `{ "erro": "mensagem em po
 | `DELETE` | `/api/posts/:id/curtida` | Descurte e devolve os pontos daquela curtida |
 | `POST` | `/api/posts/:id/comentarios` | Comenta (`texto`). Devolve os pontos ganhos |
 | `PUT` | `/api/posts/:id` | O autor edita `titulo` e `descricao`. O link não muda, e editar não mexe em pontos |
+| `POST` | `/api/posts/:id/denuncias` | Denuncia o post (`motivo`, `detalhe`). Uma vez por pessoa, nunca o próprio post |
+| `GET` | `/api/denuncias/motivos` | Os motivos de denúncia, com o texto de cada um |
+| `GET` | `/api/admin/denuncias` | Fila da moderação: posts com denúncias abertas, os mais denunciados primeiro (só admin) |
+| `POST` | `/api/admin/denuncias/:postId/manter` | Encerra as denúncias e mantém o post (só admin). Para remover, use `DELETE /api/posts/:id` |
 | `DELETE` | `/api/posts/:id` | Remove o post. O autor apaga o próprio post (os pontos ficam). O admin remove qualquer post (o autor perde os pontos ganhos com ele). Nos dois casos o link não pode ser divulgado de novo |
 | `GET` | `/api/rankings?periodo=semana\|geral&tipo=engajador\|criador` | Top da Semana (zera toda segunda 00:00 de Brasília) ou Top Geral (só quem tem 10 pontos ou mais) |
 | `GET` | `/api/carteira` | Carteira de pontos de prêmio: saldo de sempre, pontos da semana e de hoje, e extrato |
@@ -94,6 +98,7 @@ Valores padrão (todos mudam no arquivo de regras ou na tela de admin):
 - **Comentário com menos de 20 caracteres** é publicado, mas não pontua. Só o primeiro comentário da pessoa em cada post pontua.
 - **Curtida pontua uma vez só:** descurtir devolve os pontos, e curtir de novo não soma de novo.
 - **Até 5 posts por dia.**
+- **Até 10 denúncias por pessoa por dia**, para ninguém encher a fila da moderação.
 - **Até 10 contas novas por IP por hora**, para ninguém criar contas falsas em série e usá-las para pontuar os próprios posts. Passou disso, o cadastro responde `429` com o tempo de espera.
 
 O dia vira à meia-noite de Brasília.
