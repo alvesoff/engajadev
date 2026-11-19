@@ -56,6 +56,9 @@ export default function Perfil() {
               <Link to="/carteira" className="botao">
                 Minha carteira
               </Link>
+              <Link to="/conta" className="botao">
+                Minha conta
+              </Link>
               <button type="button" className="botao so-celular" onClick={sair}>
                 Sair
               </button>
