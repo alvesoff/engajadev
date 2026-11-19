@@ -30,7 +30,7 @@ npm test
 | `PORT` | `4400` | Porta da API |
 | `DB_PATH` | `./data/engajadev.db` | Arquivo do banco SQLite |
 | `NODE_ENV` | `development` | Em `production` o cookie sai com `Secure` (só HTTPS) |
-| `TRUST_PROXY` | desligado | Ligue (ex.: `1`) quando a API ficar atrás de um proxy, para o limite por IP ver o IP real |
+| `TRUST_PROXY` | desligado | Número de proxies na frente da API (ex.: `1`), para o limite por IP ver o IP real |
 
 ## Rotas
 
