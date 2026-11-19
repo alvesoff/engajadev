@@ -1,6 +1,8 @@
 import express from 'express';
 import { ErroHttp } from './erros.js';
+import { criarLeitorRegras } from './regras.js';
 import { carregarSessao, rotasAuth } from './rotas/auth.js';
+import { rotasPosts } from './rotas/posts.js';
 
 /**
  * Monta a aplicação.
@@ -11,7 +13,7 @@ import { carregarSessao, rotasAuth } from './rotas/auth.js';
  * @param {boolean|string|number} [opcoes.trustProxy] valor do "trust proxy" do Express
  */
 export function criarApp({ db, agora = () => Date.now(), limites, trustProxy = false } = {}) {
-  const ctx = { db, agora };
+  const ctx = { db, agora, regras: criarLeitorRegras() };
 
   const app = express();
   app.disable('x-powered-by');
@@ -20,6 +22,7 @@ export function criarApp({ db, agora = () => Date.now(), limites, trustProxy = f
   app.use(carregarSessao(ctx));
 
   app.use('/api/auth', rotasAuth(ctx, limites));
+  app.use('/api/posts', rotasPosts(ctx));
   app.use('/api', (_req, _res, next) => next(new ErroHttp(404, 'Rota não encontrada.')));
 
   // eslint-disable-next-line no-unused-vars

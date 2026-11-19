@@ -38,6 +38,8 @@ export async function criarAmbiente({ limites } = {}) {
     return {
       get: (c) => req('GET', c),
       post: (c, b = {}, o) => req('POST', c, b, o),
+      put: (c, b = {}) => req('PUT', c, b),
+      del: (c) => req('DELETE', c),
       get cookie() {
         return cookie;
       },
@@ -47,10 +49,47 @@ export async function criarAmbiente({ limites } = {}) {
     };
   }
 
+  /** Cria a conta de uma pessoa e devolve o "navegador" já conectado. */
+  async function pessoa(apelido, extra = {}) {
+    const c = cliente();
+    const r = await c.post('/api/auth/cadastro', {
+      nome: apelido[0].toUpperCase() + apelido.slice(1),
+      usuario: apelido,
+      email: `${apelido}@exemplo.com`,
+      senha: 'senha-forte-123',
+      ...extra,
+    });
+    if (r.status !== 201) throw new Error(`cadastro de ${apelido} falhou: ${r.texto}`);
+    c.id = r.body.id;
+    return c;
+  }
+
+  /** Publica um post e devolve o id. */
+  let nPost = 0;
+  async function postar(c, extra = {}) {
+    nPost += 1;
+    const r = await c.post('/api/posts', { url: `https://dev.to/teste/post-${nPost}`, titulo: `Post ${nPost}`, ...extra });
+    if (r.status !== 201) throw new Error(`postar falhou: ${r.texto}`);
+    return r.body.post.id;
+  }
+
+  /** Soma dos pontos de uma pessoa no livro-razão, por papel. */
+  function pontosDe(id) {
+    const linhas = db
+      .prepare(`SELECT papel, COALESCE(SUM(pontos), 0) AS s FROM lancamentos WHERE usuario_id = ? GROUP BY papel`)
+      .all(id);
+    const out = { engajador: 0, criador: 0 };
+    for (const l of linhas) out[l.papel] = l.s;
+    return out;
+  }
+
   return {
     db,
     relogio,
     cliente,
+    pessoa,
+    postar,
+    pontosDe,
     fechar: () => new Promise((ok) => servidor.close(ok)),
   };
 }

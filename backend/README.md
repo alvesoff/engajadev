@@ -1,6 +1,6 @@
 # EngajaDev: backend
 
-API de contas do EngajaDev: cadastro, entrar, sair e "quem sou eu". Node.js + Express + SQLite nativo do Node (`node:sqlite`), sem banco externo para instalar.
+API do EngajaDev: contas, posts, curtidas, comentários e pontos. Node.js + Express + SQLite nativo do Node (`node:sqlite`), sem banco externo para instalar.
 
 ## Requisitos
 
@@ -42,6 +42,12 @@ Todas recebem e devolvem JSON. Em erro, a resposta é `{ "erro": "mensagem em po
 | `POST` | `/api/auth/entrar` | Entra com `email` e `senha`. `200` |
 | `POST` | `/api/auth/sair` | Encerra a sessão. `204` |
 | `GET` | `/api/auth/eu` | Devolve quem está conectado, ou `401` |
+| `GET` | `/api/posts` | Feed, do mais novo para o mais antigo. Filtros: `rede`, `antes` (página), `limite` |
+| `POST` | `/api/posts` | Publica um link (`url`, `titulo`, `descricao`). A rede é descoberta pelo endereço |
+| `GET` | `/api/posts/:id` | Um post com os comentários |
+| `POST` | `/api/posts/:id/curtida` | Curte. Devolve os pontos ganhos |
+| `DELETE` | `/api/posts/:id/curtida` | Descurte e devolve os pontos daquela curtida |
+| `POST` | `/api/posts/:id/comentarios` | Comenta (`texto`). Devolve os pontos ganhos |
 
 ## Segurança
 
