@@ -52,6 +52,7 @@ Todas recebem e devolvem JSON. Em erro, a resposta é `{ "erro": "mensagem em po
 | `POST` | `/api/posts/:id/curtida` | Curte. Devolve os pontos ganhos |
 | `DELETE` | `/api/posts/:id/curtida` | Descurte e devolve os pontos daquela curtida |
 | `POST` | `/api/posts/:id/comentarios` | Comenta (`texto`). Devolve os pontos ganhos |
+| `DELETE` | `/api/posts/:id` | Remove o post. O autor apaga o próprio post (os pontos ficam e o link fica livre). O admin remove qualquer post (o autor perde os pontos ganhos com ele e o link fica bloqueado) |
 | `GET` | `/api/rankings?periodo=semana\|geral&tipo=engajador\|criador` | Top da Semana (zera toda segunda 00:00 de Brasília) ou Top Geral (só quem tem 10 pontos ou mais) |
 | `GET` | `/api/carteira` | Carteira de pontos de prêmio: saldo de sempre, pontos da semana e de hoje, e extrato |
 | `GET` | `/api/usuarios/:usuario` | Perfil público: posts, pontos e posição nos rankings (sem e-mail) |

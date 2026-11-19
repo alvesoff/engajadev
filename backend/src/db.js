@@ -116,7 +116,18 @@ export function abrirBanco(caminho = ':memory:') {
   db.exec('PRAGMA foreign_keys = ON;');
   if (caminho !== ':memory:') db.exec('PRAGMA journal_mode = WAL;');
   db.exec(ESQUEMA);
+  migrar(db);
   return db;
+}
+
+/** Acrescenta colunas novas em bancos criados antes delas existirem. */
+function migrar(db) {
+  const colunas = (tabela) => new Set(db.prepare(`PRAGMA table_info(${tabela})`).all().map((c) => c.name));
+  const posts = colunas('posts');
+  // Moderação: post removido some do site, mas a linha fica (histórico e estorno de pontos).
+  if (!posts.has('removido_em')) db.exec('ALTER TABLE posts ADD COLUMN removido_em INTEGER');
+  if (!posts.has('removido_por')) db.exec('ALTER TABLE posts ADD COLUMN removido_por INTEGER REFERENCES usuarios(id) ON DELETE SET NULL');
+  if (!posts.has('removido_motivo')) db.exec("ALTER TABLE posts ADD COLUMN removido_motivo TEXT CHECK (removido_motivo IN ('autor', 'moderacao'))");
 }
 
 /** Roda fn dentro de uma transação: ou grava tudo, ou nada. */
