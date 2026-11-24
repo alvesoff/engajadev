@@ -23,6 +23,7 @@ export function postPublico(p) {
     descricao: p.descricao,
     rede: p.rede,
     criadoEm: p.criado_em,
+    editadoEm: p.editado_em ?? null,
     autor: { id: p.usuario_id, nome: p.autor_nome, usuario: p.autor_usuario },
     curtidas: p.n_curtidas,
     comentarios: p.n_comentarios,
@@ -83,19 +84,25 @@ export function rotasPosts(ctx) {
     res.json({ posts, proximo: posts.length ? posts.at(-1).id : null, destaques });
   });
 
-  r.post('/', exigirLogin, (req, res) => {
+  /** Confere título e descrição (ao publicar e ao editar). */
+  function validarTextos(corpo) {
     const regras = ctx.regras();
-    const link = analisarLink(req.body?.url);
-    const titulo = texto(req.body?.titulo);
-    const descricao = texto(req.body?.descricao);
-    if (!texto(req.body?.url)) throw erro(400, 'Cole o link do seu post.', { campo: 'url' });
-    if (!link) throw erro(400, 'Este link não parece válido. Ele precisa começar com http:// ou https://.', { campo: 'url' });
+    const titulo = texto(corpo?.titulo);
+    const descricao = texto(corpo?.descricao);
     if (titulo.length < 3 || titulo.length > regras.texto.tituloMax) {
       throw erro(400, `O título deve ter de 3 a ${regras.texto.tituloMax} caracteres.`, { campo: 'titulo' });
     }
     if (descricao.length > regras.texto.descricaoMax) {
       throw erro(400, `A descrição pode ter até ${regras.texto.descricaoMax} caracteres.`, { campo: 'descricao' });
     }
+    return { titulo, descricao };
+  }
+
+  r.post('/', exigirLogin, (req, res) => {
+    const link = analisarLink(req.body?.url);
+    if (!texto(req.body?.url)) throw erro(400, 'Cole o link do seu post.', { campo: 'url' });
+    if (!link) throw erro(400, 'Este link não parece válido. Ele precisa começar com http:// ou https://.', { campo: 'url' });
+    const { titulo, descricao } = validarTextos(req.body);
     if (ctx.db.prepare('SELECT 1 FROM posts WHERE url = ?').get(link.url)) {
       throw erro(409, 'Este link já foi divulgado no EngajaDev.', { campo: 'url' });
     }
@@ -177,6 +184,24 @@ export function rotasPosts(ctx) {
       comentario: comentarioPublico({ ...c, nome: req.usuario.nome, usuario: req.usuario.usuario }),
       pontos: resultado.pontos,
     });
+  });
+
+  /**
+   * Editar título e descrição do próprio post. O link não muda: ele é o que identifica o post
+   * (trocar o link seria divulgar outro conteúdo com as curtidas e comentários deste).
+   * Editar não mexe em pontos.
+   */
+  r.put('/:id', exigirLogin, (req, res) => {
+    const post = buscarPost(ctx, req.params.id, req.usuario.id);
+    if (post.usuario_id !== req.usuario.id) throw erro(403, 'Só quem publicou pode editar este post.');
+    if (req.body?.url !== undefined && texto(req.body.url) !== post.url) {
+      throw erro(400, 'O link do post não pode ser trocado. Para divulgar outro link, publique um post novo.', { campo: 'url' });
+    }
+    const { titulo, descricao } = validarTextos(req.body);
+    if (titulo !== post.titulo || descricao !== post.descricao) {
+      ctx.db.prepare('UPDATE posts SET titulo = ?, descricao = ?, editado_em = ? WHERE id = ?').run(titulo, descricao, ctx.agora(), post.id);
+    }
+    res.json({ post: postPublico(buscarPost(ctx, post.id, req.usuario.id)) });
   });
 
   /**

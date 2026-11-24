@@ -6,6 +6,82 @@ import Avatar from '../componentes/Avatar.jsx';
 import Icone from '../componentes/Icone.jsx';
 import { BotaoCurtir, SeloRede } from '../componentes/CardPost.jsx';
 
+/** Formulário para o autor corrigir título e descrição. O link não muda. */
+function EditarPost({ post, texto, aoSalvar, aoCancelar }) {
+  const [campos, setCampos] = useState({ titulo: post.titulo, descricao: post.descricao ?? '' });
+  const [erros, setErros] = useState({});
+  const [erroGeral, setErroGeral] = useState('');
+  const [salvando, setSalvando] = useState(false);
+  const tituloMax = texto?.tituloMax ?? 120;
+
+  function mudar(e) {
+    const { name, value } = e.target;
+    setCampos((c) => ({ ...c, [name]: value }));
+    if (erros[name]) setErros((x) => ({ ...x, [name]: undefined }));
+  }
+
+  async function salvar(e) {
+    e.preventDefault();
+    setErroGeral('');
+    if (campos.titulo.trim().length < 3) return setErros({ titulo: `O título deve ter de 3 a ${tituloMax} caracteres.` });
+    setSalvando(true);
+    try {
+      const r = await api(`/posts/${post.id}`, { metodo: 'PUT', corpo: campos });
+      aoSalvar(r.post);
+    } catch (e2) {
+      if (e2.campo && e2.campo !== 'url') setErros({ [e2.campo]: e2.message });
+      else setErroGeral(e2.message);
+      setSalvando(false);
+    }
+  }
+
+  const props = (nome) => ({
+    id: `editar-${nome}`,
+    name: nome,
+    value: campos[nome],
+    onChange: mudar,
+    'aria-invalid': erros[nome] ? 'true' : undefined,
+    'aria-describedby': erros[nome] ? `editar-${nome}-erro` : undefined,
+  });
+  const Erro = ({ nome }) =>
+    erros[nome] ? (
+      <p className="erro-campo" id={`editar-${nome}-erro`}>
+        {erros[nome]}
+      </p>
+    ) : null;
+
+  return (
+    <form className="formulario editar-post" onSubmit={salvar} noValidate aria-label="Editar post">
+      <div className={`campo${erros.titulo ? ' com-erro' : ''}`}>
+        <label htmlFor="editar-titulo">Título</label>
+        <input {...props('titulo')} maxLength={tituloMax} autoFocus />
+        <Erro nome="titulo" />
+      </div>
+      <div className={`campo${erros.descricao ? ' com-erro' : ''}`}>
+        <label htmlFor="editar-descricao">
+          Descrição <span className="sutil">(opcional)</span>
+        </label>
+        <textarea {...props('descricao')} rows={4} maxLength={texto?.descricaoMax ?? 500} />
+        <Erro nome="descricao" />
+      </div>
+      <p className="sutil">O link não muda. Curtidas, comentários e pontos continuam.</p>
+      {erroGeral && (
+        <p className="erro-geral" role="alert">
+          {erroGeral}
+        </p>
+      )}
+      <div className="linha-botoes">
+        <button type="submit" className="botao primario" disabled={salvando}>
+          {salvando ? 'Salvando…' : 'Salvar'}
+        </button>
+        <button type="button" className="botao" onClick={aoCancelar} disabled={salvando}>
+          Cancelar
+        </button>
+      </div>
+    </form>
+  );
+}
+
 export default function Post() {
   const { id } = useParams();
   const { eu, avisar, recarregar } = useSessao();
@@ -17,6 +93,7 @@ export default function Post() {
   const [erroComentario, setErroComentario] = useState('');
   const [confirmarRemocao, setConfirmarRemocao] = useState(false);
   const [removendo, setRemovendo] = useState(false);
+  const [editando, setEditando] = useState(false);
   const navegar = useNavigate();
 
   // Só busca depois de saber quem está conectado (eu !== undefined): assim uma resposta
@@ -96,13 +173,29 @@ export default function Post() {
               <strong>{post.autor.nome}</strong>
               <small>
                 @{post.autor.usuario} · {tempoRelativo(post.criadoEm)}
+                {post.editadoEm && ' · editado'}
               </small>
             </span>
           </Link>
           <SeloRede rede={post.rede} />
         </header>
-        <h1>{post.titulo}</h1>
-        {post.descricao && <p className="descricao">{post.descricao}</p>}
+        {editando ? (
+          <EditarPost
+            post={post}
+            texto={regras?.texto}
+            aoCancelar={() => setEditando(false)}
+            aoSalvar={(p) => {
+              setDados((d) => ({ ...d, post: p }));
+              setEditando(false);
+              avisar({ tipo: 'ok', texto: 'Post atualizado.' });
+            }}
+          />
+        ) : (
+          <>
+            <h1>{post.titulo}</h1>
+            {post.descricao && <p className="descricao">{post.descricao}</p>}
+          </>
+        )}
         <a href={post.url} target="_blank" rel="noopener noreferrer" className="botao primario largo">
           <Icone nome="externo" /> Abrir o post original
         </a>
@@ -116,9 +209,16 @@ export default function Post() {
         {(proprio || eu?.admin) && (
           <div className="remover-post">
             {!confirmarRemocao ? (
-              <button type="button" className="botao perigo pequeno" onClick={() => setConfirmarRemocao(true)}>
-                {proprio ? 'Apagar meu post' : 'Remover post (moderação)'}
-              </button>
+              <>
+                {proprio && !editando && (
+                  <button type="button" className="botao pequeno" onClick={() => setEditando(true)}>
+                    Editar
+                  </button>
+                )}
+                <button type="button" className="botao perigo pequeno" onClick={() => setConfirmarRemocao(true)}>
+                  {proprio ? 'Apagar meu post' : 'Remover post (moderação)'}
+                </button>
+              </>
             ) : (
               <>
                 <p role="alert">
