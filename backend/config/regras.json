@@ -13,7 +13,8 @@
     "comentarioMinCaracteres": 20,
     "comentariosPontuadosPorPost": 1,
     "postsPorDia": 5,
-    "cadastrosPorIpHora": 10
+    "cadastrosPorIpHora": 10,
+    "denunciasPorDia": 10
   },
   "ranking": {
     "limiarTopGeral": 10,

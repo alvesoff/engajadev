@@ -14,7 +14,7 @@ São duas pastas separadas. O backend sobe primeiro.
 # backend (API) em http://localhost:4400
 cd backend
 npm install
-npm test                                  # 140 testes automáticos
+npm test                                  # 145 testes automáticos
 DB_PATH=./data/exemplo.db npm run semear  # opcional: dados de exemplo
 DB_PATH=./data/exemplo.db ADMIN_EMAILS=anadev@exemplo.com npm start
 
@@ -124,6 +124,16 @@ As contas de exemplo usam a senha `senha-forte-123`. Com o comando acima, `anade
 - **Quem administra remove qualquer post** (spam, link quebrado, fora do tema) pelo botão "Remover post (moderação)". O autor perde os pontos que ganhou com aquele post, e o link também continua bloqueado. Quem curtiu ou comentou agiu de boa-fé e mantém os pontos.
 - O post removido não é apagado do banco: fica guardado quem removeu, quando e por quê. Bancos criados antes desta mudança ganham as colunas novas sozinhos, sem perder dados.
 
+### Denúncias
+
+- Quem está conectado usa "Denunciar post" na página do post e escolhe o motivo: spam, não é sobre tecnologia, link quebrado, conteúdo ofensivo ou outro (este pede um detalhe).
+- Cada pessoa denuncia um post uma vez só e não pode denunciar o próprio post. Para ninguém encher a fila, há um limite de **10 denúncias por pessoa por dia**, que também é uma regra configurável.
+- Quem administra vê a fila em `/admin/denuncias`, com o post mais denunciado primeiro, os motivos e quem denunciou. Só a moderação vê quem denunciou.
+- A moderação decide:
+  - **Manter:** a denúncia não procede e o post fica.
+  - **Remover:** usa a mesma remoção da moderação, e o autor perde os pontos ganhos com o post.
+- **O post não some sozinho** depois de várias denúncias. Um grupo combinado poderia usar isso para derrubar o post de alguém, então quem decide é sempre uma pessoa.
+
 ### Telas (celular e computador)
 
 Entrar/criar conta, feed, divulgar post, post (curtir e comentar), rankings, carteira, perfil, como pontuar, prêmios e as telas de admin (regras e prêmios).
@@ -150,7 +160,7 @@ Entrar/criar conta, feed, divulgar post, post (curtir e comentar), rankings, car
 - **O engajamento que pontua acontece dentro do EngajaDev.** As redes não contam para sistemas de fora quem curtiu ou comentou. Por isso seguimos o caminho 1 da [discussão #2](https://github.com/alvesoff/engajadev/discussions/2): o link leva ao post original, mas a curtida e o comentário que valem ponto são feitos aqui. Assim o ponto é confiável, e ninguém é recompensado por engajar no LinkedIn ou no Instagram, o que essas redes podem tratar como engajamento falso.
 - **Duas janelas de ranking (Semana e Geral).** A visão fala em "três janelas", mas só nomeia duas. Ficamos com as duas nomeadas, para não inventar regra. Um "Top do Mês" é fácil de acrescentar depois, porque o ranking é só uma soma sobre um período.
 - **Semana virando na segunda 00:00 de Brasília.** É o padrão mais comum. Dia, hora e fuso mudam no arquivo de regras.
-- **Valores iniciais** (1 por curtida, 3 por comentário, 30/60 por dia, 10 segundos, 5 posts por dia, 10 contas novas por IP por hora, 10 pontos no Top Geral) foram escolhidos para começar. Todos mudam no arquivo ou na tela de admin.
+- **Valores iniciais** (1 por curtida, 3 por comentário, 30/60 por dia, 10 segundos, 5 posts por dia, 10 contas novas por IP por hora, 10 denúncias por pessoa por dia, 10 pontos no Top Geral) foram escolhidos para começar. Todos mudam no arquivo ou na tela de admin.
 - **Quem é admin** é definido pela variável `ADMIN_EMAILS` do backend. É o jeito mais simples, sem precisar de uma tela de permissões agora.
 - **Limite diário acabou:** a curtida ou o comentário continua valendo no post, só não pontua. Se quem engajou já bateu o limite, o autor também não ganha. Isso evita usar contas "cheias" só para inflar o post de alguém.
 - **Stack:** Node.js + Express + SQLite nativo do Node no backend, React + Vite nas telas. A [votação da stack](https://github.com/alvesoff/engajadev/discussions/1) ainda está aberta. Escolhemos o que roda sem instalar nada além do Node e é fácil para quem está começando. Trocar SQLite por PostgreSQL depois é simples, porque as consultas são SQL comum.
@@ -159,7 +169,7 @@ Entrar/criar conta, feed, divulgar post, post (curtir e comentar), rankings, car
   - O custo é copiado no resgate: se o preço mudar depois, o histórico não muda.
   - Para brindes físicos, o sistema **não pede endereço** (cuidado com dados pessoais, LGPD). A organização combina a entrega pelo e-mail da conta.
   - O destaque só vale para post próprio, e o mesmo post não pode estar em dois destaques ao mesmo tempo.
-- **Fora desta entrega:** bio no perfil, recuperar senha por e-mail e entrar com Google ou GitHub (precisam de um serviço de e-mail ou de chaves dessas contas), denunciar posts (a remoção já existe, veja Moderação) e integração com as APIs das redes (precisa de chaves de cada rede).
+- **Fora desta entrega:** bio no perfil, recuperar senha por e-mail e entrar com Google ou GitHub (precisam de um serviço de e-mail ou de chaves dessas contas), integração com as APIs das redes (precisa de chaves de cada rede).
 
 ## Mapa do código
 
@@ -180,7 +190,7 @@ backend/
     premios.js         catálogo, resgate, entrega e cancelamento (2ª fase)
     semear.js          dados de exemplo (npm run semear)
     rotas/             auth, posts, rankings, carteira, usuarios, regras, premios
-  test/                140 testes automáticos
+  test/                145 testes automáticos
 frontend/
   src/
     App.jsx            menu (embaixo no celular, no topo no computador) e rotas

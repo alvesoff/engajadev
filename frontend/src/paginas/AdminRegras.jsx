@@ -73,9 +73,14 @@ export default function AdminRegras() {
   return (
     <form className="pilha estreito" onSubmit={salvar} noValidate>
       <h1>Regras do jogo</h1>
-      <Link to="/admin/premios" className="botao">
-        Gerir prêmios e resgates
-      </Link>
+      <div className="linha-botoes">
+        <Link to="/admin/premios" className="botao">
+          Gerir prêmios e resgates
+        </Link>
+        <Link to="/admin/denuncias" className="botao">
+          Ver denúncias
+        </Link>
+      </div>
       <p className="sutil">
         O que você muda aqui vale na hora, por cima do arquivo <code>backend/config/regras.json</code>. Use “restaurar” para
         voltar ao valor do arquivo.

@@ -14,6 +14,7 @@ import Perfil from './paginas/Perfil.jsx';
 import Carteira from './paginas/Carteira.jsx';
 import ComoPontuar from './paginas/ComoPontuar.jsx';
 import AdminRegras from './paginas/AdminRegras.jsx';
+import AdminDenuncias from './paginas/AdminDenuncias.jsx';
 import Premios from './paginas/Premios.jsx';
 import AdminPremios from './paginas/AdminPremios.jsx';
 
@@ -102,6 +103,7 @@ function Topo() {
           <NavLink to="/premios">Prêmios</NavLink>
           <NavLink to="/como-pontuar">Como pontuar</NavLink>
           {eu?.admin && <NavLink to="/admin/regras">Regras</NavLink>}
+          {eu?.admin && <NavLink to="/admin/denuncias">Denúncias</NavLink>}
         </nav>
         <div className="topo-acoes">
           {eu && (
@@ -167,6 +169,7 @@ export default function App() {
             <Route path="/admin/regras" element={<ExigeLogin><AdminRegras /></ExigeLogin>} />
             <Route path="/premios" element={<Premios />} />
             <Route path="/admin/premios" element={<ExigeLogin><AdminPremios /></ExigeLogin>} />
+            <Route path="/admin/denuncias" element={<ExigeLogin><AdminDenuncias /></ExigeLogin>} />
             <Route
               path="*"
               element={

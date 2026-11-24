@@ -38,6 +38,10 @@ export const ESQUEMA = {
     padrao: 10, min: 0, max: 100000, grupo: 'Limites (anti-gaming)',
     rotulo: 'Contas novas por IP por hora', ajuda: 'Evita criar contas falsas em série para inflar pontos. 0 = sem limite.',
   },
+  'limites.denunciasPorDia': {
+    padrao: 10, min: 0, max: 1000, grupo: 'Limites (anti-gaming)',
+    rotulo: 'Denúncias por pessoa por dia', ajuda: 'Evita que alguém encha a fila da moderação. 0 = sem limite.',
+  },
   'limites.postsPorDia': {
     padrao: 5, min: 0, max: 1000, grupo: 'Limites (anti-gaming)',
     rotulo: 'Posts por dia', ajuda: 'Quantos links cada pessoa pode divulgar por dia. 0 = sem limite.',

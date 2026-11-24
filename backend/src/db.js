@@ -101,6 +101,23 @@ CREATE TABLE IF NOT EXISTS resgates (
 CREATE INDEX IF NOT EXISTS resgates_usuario ON resgates(usuario_id, status);
 CREATE INDEX IF NOT EXISTS resgates_destaque ON resgates(destaque_ate);
 
+-- Denúncias de posts feitas pela comunidade. Uma por pessoa por post.
+-- resultado: 'removido' (o post saiu do ar) ou 'mantido' (a moderação achou que não procede).
+CREATE TABLE IF NOT EXISTS denuncias (
+  id INTEGER PRIMARY KEY,
+  post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  usuario_id INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  motivo TEXT NOT NULL CHECK (motivo IN ('spam', 'fora_do_tema', 'link_quebrado', 'ofensivo', 'outro')),
+  detalhe TEXT NOT NULL DEFAULT '',
+  criado_em INTEGER NOT NULL,
+  resolvida_em INTEGER,
+  resolvida_por INTEGER REFERENCES usuarios(id) ON DELETE SET NULL,
+  resultado TEXT CHECK (resultado IN ('removido', 'mantido')),
+  UNIQUE (post_id, usuario_id)
+);
+CREATE INDEX IF NOT EXISTS denuncias_abertas ON denuncias(resolvida_em, post_id);
+CREATE INDEX IF NOT EXISTS denuncias_usuario ON denuncias(usuario_id, criado_em);
+
 -- Regras mudadas pela tela de admin. Valem por cima do config/regras.json.
 CREATE TABLE IF NOT EXISTS regras_override (
   chave TEXT PRIMARY KEY,
