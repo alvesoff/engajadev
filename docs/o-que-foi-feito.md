@@ -14,7 +14,7 @@ São duas pastas separadas. O backend sobe primeiro.
 # backend (API) em http://localhost:4400
 cd backend
 npm install
-npm test                                  # 154 testes automáticos
+npm test                                  # 159 testes automáticos
 DB_PATH=./data/exemplo.db npm run semear  # opcional: dados de exemplo
 DB_PATH=./data/exemplo.db ADMIN_EMAILS=anadev@exemplo.com npm start
 
@@ -197,7 +197,7 @@ backend/
     premios.js         catálogo, resgate, entrega e cancelamento (2ª fase)
     semear.js          dados de exemplo (npm run semear)
     rotas/             auth, posts, rankings, carteira, usuarios, regras, premios
-  test/                154 testes automáticos
+  test/                159 testes automáticos
 frontend/
   src/
     App.jsx            menu (embaixo no celular, no topo no computador) e rotas

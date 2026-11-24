@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { createHash, randomBytes } from 'node:crypto';
 import { erro } from '../erros.js';
 import { conferirSenha, conferirSenhaFalsa, gerarHash } from '../senha.js';
-import { criarLimitador } from '../limite.js';
+import { criarLimitador, criarContadorJanela } from '../limite.js';
 
 export const COOKIE = 'engajadev_sessao';
 const SESSAO_DIAS = 30;
@@ -131,15 +131,11 @@ export function rotasAuth(ctx, { porEmail = 5, porIp = 50, janelaMs = 15 * MIN }
   // Contas criadas por IP na última hora (anti-gaming: contas falsas em série).
   // A vaga é reservada antes de calcular o hash (que é demorado), para pedidos simultâneos
   // não passarem do limite; se o cadastro falhar, a vaga volta.
-  const cadastrosPorIp = new Map(); // ip -> [instantes]
+  const cadastrosPorIp = criarContadorJanela({ janelaMs: 60 * MIN, agora: ctx.agora });
   function reservarCadastro(ip) {
-    const maximo = ctx.regras().limites.cadastrosPorIpHora;
-    const desde = ctx.agora() - 60 * MIN;
-    const recentes = (cadastrosPorIp.get(ip) ?? []).filter((t) => t > desde);
-    if (recentes.length) cadastrosPorIp.set(ip, recentes);
-    else cadastrosPorIp.delete(ip);
-    if (maximo > 0 && recentes.length >= maximo) {
-      const espera = Math.max(1, Math.ceil((recentes[0] + 60 * MIN - ctx.agora()) / 1000));
+    const vaga = cadastrosPorIp.reservar(ip, ctx.regras().limites.cadastrosPorIpHora);
+    if (vaga.esperaSegundos) {
+      const espera = vaga.esperaSegundos;
       const minutos = Math.ceil(espera / 60);
       const e = erro(429, `Muitas contas criadas a partir desta rede. Espere ${minutos} ${minutos === 1 ? 'minuto' : 'minutos'} e tente de novo.`, {
         esperarSegundos: espera,
@@ -147,14 +143,7 @@ export function rotasAuth(ctx, { porEmail = 5, porIp = 50, janelaMs = 15 * MIN }
       e.retryAfter = espera;
       throw e;
     }
-    const instante = ctx.agora();
-    cadastrosPorIp.set(ip, [...recentes, instante]);
-    return () => {
-      const lista = cadastrosPorIp.get(ip) ?? [];
-      const i = lista.indexOf(instante);
-      if (i >= 0) lista.splice(i, 1);
-      if (!lista.length) cadastrosPorIp.delete(ip);
-    };
+    return vaga.desfazer;
   }
 
   r.post('/cadastro', async (req, res) => {
