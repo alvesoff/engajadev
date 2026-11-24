@@ -316,6 +316,11 @@ main { min-width: 0; }
 .remover-post p { margin: 0; flex: 1 1 100%; }
 .formulario.editar-post { padding: 0; margin: 8px 0 4px; }
 .linha-botoes { display: flex; flex-wrap: wrap; gap: 8px; }
+.formulario.sem-borda { padding: 0; }
+.botao.com-espaco { margin-top: 12px; }
+.dados-conta { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 0 0 8px; }
+.dados-conta dt { color: var(--texto-2); }
+.dados-conta dd { margin: 0; overflow-wrap: anywhere; }
 .link.denunciar { font-size: 0.875rem; color: var(--texto-2); }
 .denuncia-enviada { margin: 0; font-size: 0.875rem; }
 .formulario.denuncia { padding: 0; flex: 1 1 100%; }

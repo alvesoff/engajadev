@@ -46,6 +46,9 @@ Todas recebem e devolvem JSON. Em erro, a resposta é `{ "erro": "mensagem em po
 | `POST` | `/api/auth/entrar` | Entra com `email` e `senha`. `200` |
 | `POST` | `/api/auth/sair` | Encerra a sessão. `204` |
 | `GET` | `/api/auth/eu` | Devolve quem está conectado, ou `401` |
+| `GET` | `/api/auth/sessoes` | Em quantos outros aparelhos a conta está aberta |
+| `POST` | `/api/auth/sair-dos-outros` | Encerra a conta nos outros aparelhos (este continua) |
+| `PUT` | `/api/auth/senha` | Troca a senha (`senhaAtual`, `senhaNova`) e sai dos outros aparelhos. 5 erros da senha atual bloqueiam por 15 minutos |
 | `GET` | `/api/posts` | Feed, do mais novo para o mais antigo. Filtros: `rede`, `antes` (página), `limite` |
 | `POST` | `/api/posts` | Publica um link (`url`, `titulo`, `descricao`). A rede é descoberta pelo endereço |
 | `GET` | `/api/posts/:id` | Um post com os comentários |

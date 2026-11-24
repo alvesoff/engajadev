@@ -91,11 +91,16 @@ function validarCadastro(corpo) {
   if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     throw erro(400, 'Este e-mail não parece válido. Confira se digitou certo.', { campo: 'email' });
   }
-  if (!senha) throw erro(400, 'Crie uma senha.', { campo: 'senha' });
-  if (senha.length < 8) throw erro(400, 'A senha precisa ter pelo menos 8 caracteres.', { campo: 'senha' });
-  if (senha.length > 128) throw erro(400, 'A senha pode ter no máximo 128 caracteres.', { campo: 'senha' });
+  validarSenhaNova(senha, 'senha');
 
   return { nome, usuario, email, senha };
+}
+
+/** Regras da senha (no cadastro e na troca de senha). */
+function validarSenhaNova(senha, campo) {
+  if (!senha) throw erro(400, 'Crie uma senha.', { campo });
+  if (senha.length < 8) throw erro(400, 'A senha precisa ter pelo menos 8 caracteres.', { campo });
+  if (senha.length > 128) throw erro(400, 'A senha pode ter no máximo 128 caracteres.', { campo });
 }
 
 /**
@@ -207,6 +212,58 @@ export function rotasAuth(ctx, { porEmail = 5, porIp = 50, janelaMs = 15 * MIN }
   });
 
   r.get('/eu', exigirLogin, (req, res) => res.json(eu(req.usuario)));
+
+  // ---- segurança da conta ----
+  const tokenAtual = (req) => hashToken(lerCookie(req, COOKIE) ?? '');
+  /** Encerra as sessões da pessoa em outros aparelhos (a deste aparelho continua). */
+  const encerrarOutras = (req) =>
+    Number(
+      ctx.db
+        .prepare('DELETE FROM sessoes WHERE usuario_id = ? AND token_hash <> ?')
+        .run(req.usuario.id, tokenAtual(req)).changes,
+    );
+  // Errar a senha atual muitas vezes bloqueia a troca (quem pegou um aparelho logado não fica chutando).
+  const limiteTroca = criarLimitador({ maximo: porEmail, janelaMs, agora: ctx.agora });
+
+  /** Quantos outros aparelhos estão conectados na conta. */
+  r.get('/sessoes', exigirLogin, (req, res) => {
+    const { n } = ctx.db
+      .prepare('SELECT COUNT(*) AS n FROM sessoes WHERE usuario_id = ? AND token_hash <> ? AND expira_em > ?')
+      .get(req.usuario.id, tokenAtual(req), ctx.agora());
+    res.json({ outras: n });
+  });
+
+  r.post('/sair-dos-outros', exigirLogin, (req, res) => {
+    res.json({ encerradas: encerrarOutras(req) });
+  });
+
+  /** Trocar a senha: pede a atual; ao trocar, sai dos outros aparelhos. */
+  r.put('/senha', exigirLogin, async (req, res) => {
+    const atual = typeof req.body?.senhaAtual === 'string' ? req.body.senhaAtual : '';
+    const nova = typeof req.body?.senhaNova === 'string' ? req.body.senhaNova : '';
+    if (!atual) throw erro(400, 'Informe sua senha atual.', { campo: 'senhaAtual' });
+    validarSenhaNova(nova, 'senhaNova');
+
+    const chave = `troca:${req.usuario.id}`;
+    const espera = limiteTroca.bloqueadoPor(chave);
+    if (espera > 0) {
+      res.setHeader('Retry-After', String(espera));
+      const minutos = Math.ceil(espera / 60);
+      throw erro(429, `Muitas tentativas com a senha errada. Espere ${minutos} ${minutos === 1 ? 'minuto' : 'minutos'} e tente de novo.`, {
+        esperarSegundos: espera,
+      });
+    }
+    if (atual.length > 128 || !(await conferirSenha(atual, req.usuario.senha_hash))) {
+      limiteTroca.falhou(chave);
+      throw erro(400, 'A senha atual está errada.', { campo: 'senhaAtual' });
+    }
+    limiteTroca.limpar(chave);
+    if (nova === atual) throw erro(400, 'A nova senha precisa ser diferente da atual.', { campo: 'senhaNova' });
+
+    const hash = await gerarHash(nova);
+    ctx.db.prepare('UPDATE usuarios SET senha_hash = ? WHERE id = ?').run(hash, req.usuario.id);
+    res.json({ ok: true, outrasSessoesEncerradas: encerrarOutras(req) });
+  });
 
   return r;
 }

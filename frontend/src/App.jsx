@@ -15,6 +15,7 @@ import Carteira from './paginas/Carteira.jsx';
 import ComoPontuar from './paginas/ComoPontuar.jsx';
 import AdminRegras from './paginas/AdminRegras.jsx';
 import AdminDenuncias from './paginas/AdminDenuncias.jsx';
+import Conta from './paginas/Conta.jsx';
 import Premios from './paginas/Premios.jsx';
 import AdminPremios from './paginas/AdminPremios.jsx';
 
@@ -165,6 +166,7 @@ export default function App() {
             <Route path="/rankings" element={<Rankings />} />
             <Route path="/u/:usuario" element={<Perfil />} />
             <Route path="/carteira" element={<ExigeLogin><Carteira /></ExigeLogin>} />
+            <Route path="/conta" element={<ExigeLogin><Conta /></ExigeLogin>} />
             <Route path="/como-pontuar" element={<ComoPontuar />} />
             <Route path="/admin/regras" element={<ExigeLogin><AdminRegras /></ExigeLogin>} />
             <Route path="/premios" element={<Premios />} />
