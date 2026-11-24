@@ -14,6 +14,8 @@ import Perfil from './paginas/Perfil.jsx';
 import Carteira from './paginas/Carteira.jsx';
 import ComoPontuar from './paginas/ComoPontuar.jsx';
 import AdminRegras from './paginas/AdminRegras.jsx';
+import Premios from './paginas/Premios.jsx';
+import AdminPremios from './paginas/AdminPremios.jsx';
 
 function ExigeLogin({ children }) {
   const { eu } = useSessao();
@@ -97,6 +99,7 @@ function Topo() {
           </NavLink>
           <NavLink to="/rankings">Rankings</NavLink>
           {eu && <NavLink to="/carteira">Carteira</NavLink>}
+          <NavLink to="/premios">Prêmios</NavLink>
           <NavLink to="/como-pontuar">Como pontuar</NavLink>
           {eu?.admin && <NavLink to="/admin/regras">Regras</NavLink>}
         </nav>
@@ -162,6 +165,8 @@ export default function App() {
             <Route path="/carteira" element={<ExigeLogin><Carteira /></ExigeLogin>} />
             <Route path="/como-pontuar" element={<ComoPontuar />} />
             <Route path="/admin/regras" element={<ExigeLogin><AdminRegras /></ExigeLogin>} />
+            <Route path="/premios" element={<Premios />} />
+            <Route path="/admin/premios" element={<ExigeLogin><AdminPremios /></ExigeLogin>} />
             <Route
               path="*"
               element={

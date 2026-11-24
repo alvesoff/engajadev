@@ -4,7 +4,7 @@ Este documento explica, em linguagem simples, o que o EngajaDev já faz, como ca
 
 ## Em uma frase
 
-Uma pessoa entra, divulga o link do seu post de tecnologia, a comunidade curte e comenta **dentro do EngajaDev**, cada ação vira pontos, e os pontos aparecem nos rankings e na carteira.
+Uma pessoa entra, divulga o link do seu post de tecnologia, a comunidade curte e comenta **dentro do EngajaDev**, cada ação vira pontos, os pontos aparecem nos rankings e na carteira, e a carteira pode ser trocada por prêmios.
 
 ## Como rodar
 
@@ -14,7 +14,7 @@ São duas pastas separadas. O backend sobe primeiro.
 # backend (API) em http://localhost:4400
 cd backend
 npm install
-npm test                                  # 112 testes automáticos
+npm test                                  # 125 testes automáticos
 DB_PATH=./data/exemplo.db npm run semear  # opcional: dados de exemplo
 DB_PATH=./data/exemplo.db ADMIN_EMAILS=anadev@exemplo.com npm start
 
@@ -95,9 +95,24 @@ As contas de exemplo usam a senha `senha-forte-123`. Com o comando acima, `anade
 - Valor fora da faixa (ex.: pontos negativos) é recusado com mensagem clara, e nada é salvo.
 - A página **Como pontuar** mostra as regras em vigor, lidas do backend, então está sempre certa.
 
+### Prêmios (2ª fase)
+
+- Quem administra monta o **catálogo** em `/admin/premios`. São dois tipos de prêmio:
+  - **brinde**, que a organização entrega (adesivos, camiseta, mentoria...);
+  - **destaque**, que deixa o post da pessoa no topo do feed por alguns dias.
+- Cada prêmio tem nome, descrição, custo em pontos, unidades (ou "sem limite") e pode sair do catálogo sem ser apagado.
+- Na página **Prêmios**, a pessoa vê o saldo, o preço de cada prêmio e quantos pontos faltam. Antes de trocar, ela confirma e vê quanto vai sobrar.
+- **Resgatar desconta da carteira na hora.** O saldo é tudo o que a pessoa ganhou menos o que ela já trocou.
+- Resgatar **não muda** os rankings, o total que aparece no perfil nem o limite de pontos de hoje. O ranking mede o engajamento; a carteira é o que dá para gastar.
+- O sistema confere o saldo, baixa o estoque e grava o resgate num passo só. Assim os mesmos pontos não são gastos duas vezes, mesmo com dois cliques ao mesmo tempo.
+- **Brinde:** fica "aguardando entrega" até o admin marcar como entregue. A lista do admin mostra o e-mail de quem resgatou, para combinar a entrega.
+- **Cancelar** um resgate devolve os pontos e a unidade ao estoque, uma vez só.
+- **Destaque:** a pessoa escolhe um post dela. Ele aparece em "Em destaque" no topo do feed até o prazo acabar e depois sai sozinho.
+- A carteira mostra "Meus resgates", com a situação de cada um.
+
 ### Telas (celular e computador)
 
-Entrar/criar conta, feed, divulgar post, post (curtir e comentar), rankings, carteira, perfil, como pontuar e admin.
+Entrar/criar conta, feed, divulgar post, post (curtir e comentar), rankings, carteira, perfil, como pontuar, prêmios e as telas de admin (regras e prêmios).
 
 - **Celular:** menu fixo embaixo (Feed, Rankings, Postar, Carteira, Perfil), botões grandes para o dedo e campos com letra de 16px (o iPhone não dá zoom sozinho).
 - **Computador:** menu no topo, saldo e botão "Postar" sempre à mão e o Top da Semana numa coluna ao lado.
@@ -113,6 +128,7 @@ Entrar/criar conta, feed, divulgar post, post (curtir e comentar), rankings, car
 | Funciona bem no celular e no desktop | Prints `computador-*` e `celular-*`, todos conferidos sem rolagem para o lado |
 | Back-end do núcleo entregue antes do capricho visual | Ordem dos commits: todo o backend primeiro, telas depois |
 | Commits granulares + doc do que foi feito | Um commit por etapa (`git log`) e este documento |
+| 2ª fase: pontos viram prêmios | Testes `premios` (resgate, saldo, estoque, gasto duplo, cancelamento, preço que muda depois, destaque que vence). Prints em `prints/telas-premios/` |
 
 ## Decisões que tomamos (e por quê)
 
@@ -123,8 +139,12 @@ Entrar/criar conta, feed, divulgar post, post (curtir e comentar), rankings, car
 - **Quem é admin** é definido pela variável `ADMIN_EMAILS` do backend. É o jeito mais simples, sem precisar de uma tela de permissões agora.
 - **Limite diário acabou:** a curtida ou o comentário continua valendo no post, só não pontua. Se quem engajou já bateu o limite, o autor também não ganha. Isso evita usar contas "cheias" só para inflar o post de alguém.
 - **Stack:** Node.js + Express + SQLite nativo do Node no backend, React + Vite nas telas. A [votação da stack](https://github.com/alvesoff/engajadev/discussions/1) ainda está aberta. Escolhemos o que roda sem instalar nada além do Node e é fácil para quem está começando. Trocar SQLite por PostgreSQL depois é simples, porque as consultas são SQL comum.
-- **Prêmios e resgate ficam para a 2ª fase**, como diz a visão. A carteira já guarda o saldo.
-- **Fora desta entrega:** bio no perfil, recuperar senha por e-mail, entrar com Google ou GitHub, moderação (denunciar ou apagar posts) e integração com as APIs das redes.
+- **Prêmios (2ª fase):**
+  - Os resgates ficam numa tabela separada (`resgates`), e não como pontos negativos no livro-razão. Assim trocar pontos nunca derruba ninguém no ranking nem mexe no limite diário.
+  - O custo é copiado no resgate: se o preço mudar depois, o histórico não muda.
+  - Para brindes físicos, o sistema **não pede endereço** (cuidado com dados pessoais, LGPD). A organização combina a entrega pelo e-mail da conta.
+  - O destaque só vale para post próprio, e o mesmo post não pode estar em dois destaques ao mesmo tempo.
+- **Fora desta entrega:** bio no perfil, recuperar senha por e-mail e entrar com Google ou GitHub (precisam de um serviço de e-mail ou de chaves dessas contas), moderação (denunciar ou apagar posts) e integração com as APIs das redes (precisa de chaves de cada rede).
 
 ## Mapa do código
 
@@ -133,7 +153,7 @@ backend/
   config/regras.json   regras do jogo (dá para mudar sem mexer no código)
   src/
     app.js             monta a API e liga as rotas
-    db.js              cria as tabelas (usuarios, sessoes, posts, curtidas, comentarios, lancamentos, regras_override)
+    db.js              cria as tabelas (usuarios, sessoes, posts, curtidas, comentarios, lancamentos, regras_override, premios, resgates)
     senha.js           hash da senha (scrypt)
     limite.js          limite de tentativas de login
     redes.js           descobre a rede pelo link
@@ -142,9 +162,10 @@ backend/
     pontos.js          motor de pontos e regras anti-gaming
     rankings.js        Top da Semana e Top Geral
     carteira.js        saldo e extrato
+    premios.js         catálogo, resgate, entrega e cancelamento (2ª fase)
     semear.js          dados de exemplo (npm run semear)
-    rotas/             auth, posts, rankings, carteira, usuarios, regras
-  test/                112 testes automáticos
+    rotas/             auth, posts, rankings, carteira, usuarios, regras, premios
+  test/                125 testes automáticos
 frontend/
   src/
     App.jsx            menu (embaixo no celular, no topo no computador) e rotas

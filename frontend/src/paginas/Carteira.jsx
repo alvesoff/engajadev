@@ -2,6 +2,16 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, tempoRelativo } from '../api.js';
 
+const STATUS = {
+  pendente: 'Aguardando entrega',
+  entregue: 'Entregue',
+  cancelado: 'Cancelado (pontos devolvidos)',
+};
+
+function quando(ms) {
+  return new Date(ms).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
 const TIPOS = {
   curtir: 'Você curtiu',
   comentar: 'Você comentou',
@@ -73,9 +83,19 @@ export default function Carteira() {
           {dados.saldo}
         </span>
         <p className="sutil">
-          O ranking da semana zera, a carteira não: tudo o que você ganha fica guardado aqui. O catálogo de prêmios chega numa
-          próxima fase.
+          O ranking da semana zera, a carteira não: tudo o que você ganha fica guardado aqui até você trocar por um prêmio.
         </p>
+        <Link to="/premios" className="botao primario">
+          Trocar pontos por prêmios
+        </Link>
+        <div className="linha-entre">
+          <span>
+            Ganhos no total: <strong>{dados.totalGanho}</strong>
+          </span>
+          <span>
+            Já trocados: <strong>{dados.resgatado}</strong>
+          </span>
+        </div>
         <div className="linha-entre">
           <span>
             Como engajador: <strong>{dados.porPapel.engajador}</strong>
@@ -96,6 +116,38 @@ export default function Carteira() {
         <p className="sutil">
           O limite diário evita curtida vazia. <Link to="/como-pontuar">Ver regras</Link>
         </p>
+      </section>
+
+      <section className="card">
+        <h2>Meus resgates</h2>
+        {dados.resgates.length === 0 && (
+          <p className="sutil">
+            Nenhum ainda. <Link to="/premios">Veja os prêmios</Link>.
+          </p>
+        )}
+        <ul className="extrato">
+          {dados.resgates.map((r) => (
+            <li key={r.id}>
+              <div>
+                <span>{r.premio.nome}</span>
+                {r.post && (
+                  <Link to={`/p/${r.post.id}`} className="sutil extrato-post">
+                    {r.post.titulo}
+                  </Link>
+                )}
+                <small className="sutil">
+                  {r.destaqueAte
+                    ? r.destaqueAte > Date.now()
+                      ? `Em destaque até ${quando(r.destaqueAte)}`
+                      : 'Destaque encerrado'
+                    : STATUS[r.status]}{' '}
+                  · {tempoRelativo(r.criadoEm)}
+                </small>
+              </div>
+              <strong className={r.status === 'cancelado' ? 'sutil riscado' : 'menos'}>−{r.custo}</strong>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="card">

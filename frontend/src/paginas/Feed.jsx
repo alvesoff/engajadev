@@ -10,6 +10,7 @@ export default function Feed() {
   const { eu } = useSessao();
   const [rede, setRede] = useState('');
   const [posts, setPosts] = useState(null);
+  const [destaques, setDestaques] = useState([]);
   const [proximo, setProximo] = useState(null);
   const [erro, setErro] = useState('');
 
@@ -22,6 +23,7 @@ export default function Feed() {
       .then((r) => {
         if (!vivo) return;
         setPosts(r.posts);
+        setDestaques(r.destaques ?? []);
         setProximo(r.posts.length === POR_PAGINA ? r.proximo : null);
       })
       .catch((e) => vivo && setErro(e.message));
@@ -87,6 +89,14 @@ export default function Feed() {
             Divulgar um post
           </Link>
         </div>
+      )}
+      {destaques.length > 0 && (
+        <section className="destaques" aria-label="Posts em destaque">
+          <h2>Em destaque</h2>
+          {destaques.map((p) => (
+            <CardPost key={`d${p.id}`} post={p} destaque />
+          ))}
+        </section>
       )}
       {posts?.map((p) => <CardPost key={p.id} post={p} />)}
       {proximo && (

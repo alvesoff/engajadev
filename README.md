@@ -33,7 +33,7 @@ Ainda não definida. A comunidade vai escolher na [votação da stack](https://g
 
 O projeto tem duas pastas separadas:
 
-- [`backend/`](backend/README.md): a API (contas, posts, curtidas, comentários, pontos, rankings, carteira e regras).
+- [`backend/`](backend/README.md): a API (contas, posts, curtidas, comentários, pontos, rankings, carteira, regras e prêmios).
 - [`frontend/`](frontend/README.md): as telas, para celular e computador.
 
 Cada uma tem um README com os comandos para rodar. Comece pelo backend. O que já funciona e as decisões tomadas estão em [docs/o-que-foi-feito.md](docs/o-que-foi-feito.md).

@@ -1,8 +1,9 @@
 import { inicioDoDia, janela } from './tempo.js';
+import { totalResgatado } from './premios.js';
 
 /**
  * Carteira de pontos de prêmio. É separada do ranking: a semana zera, a carteira não.
- * Saldo = tudo o que a pessoa já ganhou. (O resgate de prêmios fica para a 2ª fase.)
+ * Saldo = tudo o que a pessoa já ganhou − o que ela já trocou por prêmios (resgates não cancelados).
  */
 export function resumoCarteira(ctx, usuarioId) {
   const r = ctx.regras();
@@ -21,8 +22,11 @@ export function resumoCarteira(ctx, usuarioId) {
        FROM lancamentos WHERE usuario_id = @id`,
     )
     .get({ id: usuarioId, hoje, semana });
+  const resgatado = totalResgatado(ctx, usuarioId);
   return {
-    saldo: l.total,
+    saldo: l.total - resgatado,
+    totalGanho: l.total,
+    resgatado,
     porPapel: { engajador: l.total_engajador, criador: l.total_criador },
     semana: l.semana,
     hoje: { engajador: l.hoje_engajador, criador: l.hoje_criador },

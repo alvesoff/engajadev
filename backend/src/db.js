@@ -70,6 +70,37 @@ CREATE INDEX IF NOT EXISTS lanc_usuario_tempo ON lancamentos(usuario_id, papel, 
 CREATE INDEX IF NOT EXISTS lanc_papel_tempo ON lancamentos(papel, criado_em);
 CREATE INDEX IF NOT EXISTS lanc_ref ON lancamentos(ref_tipo, ref_id);
 
+-- Catálogo de prêmios (2ª fase). estoque NULL = sem limite.
+-- tipo 'brinde' = algo entregue pela organização; 'destaque' = o post da pessoa fica no topo do feed por alguns dias.
+CREATE TABLE IF NOT EXISTS premios (
+  id INTEGER PRIMARY KEY,
+  nome TEXT NOT NULL,
+  descricao TEXT NOT NULL DEFAULT '',
+  custo INTEGER NOT NULL CHECK (custo > 0),
+  estoque INTEGER CHECK (estoque IS NULL OR estoque >= 0),
+  tipo TEXT NOT NULL CHECK (tipo IN ('brinde', 'destaque')),
+  dias_destaque INTEGER,
+  ativo INTEGER NOT NULL DEFAULT 1,
+  criado_em INTEGER NOT NULL
+);
+
+-- Cada troca de pontos por um prêmio. O custo é copiado na hora do resgate,
+-- para uma mudança de preço depois não mudar o histórico.
+-- Os resgates NÃO entram em lancamentos: rankings e limites diários não mudam quando alguém resgata.
+CREATE TABLE IF NOT EXISTS resgates (
+  id INTEGER PRIMARY KEY,
+  usuario_id INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  premio_id INTEGER NOT NULL REFERENCES premios(id),
+  custo INTEGER NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('pendente', 'entregue', 'cancelado')),
+  post_id INTEGER REFERENCES posts(id) ON DELETE SET NULL,
+  destaque_ate INTEGER,
+  criado_em INTEGER NOT NULL,
+  atualizado_em INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS resgates_usuario ON resgates(usuario_id, status);
+CREATE INDEX IF NOT EXISTS resgates_destaque ON resgates(destaque_ate);
+
 -- Regras mudadas pela tela de admin. Valem por cima do config/regras.json.
 CREATE TABLE IF NOT EXISTS regras_override (
   chave TEXT PRIMARY KEY,

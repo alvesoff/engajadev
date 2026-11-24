@@ -52,10 +52,10 @@ export function BotaoCurtir({ post, aoMudar }) {
   );
 }
 
-export default function CardPost({ post: inicial, mostrarAutor = true }) {
+export default function CardPost({ post: inicial, mostrarAutor = true, destaque = false }) {
   const [post, setPost] = useState(inicial);
   return (
-    <article className="card post">
+    <article className={`card post${destaque ? ' em-destaque' : ''}`}>
       {mostrarAutor && (
         <header className="post-topo">
           <Link to={`/u/${post.autor.usuario}`} className="autor">

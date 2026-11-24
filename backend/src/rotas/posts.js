@@ -4,6 +4,7 @@ import { transacao } from '../db.js';
 import { analisarLink, NOMES_REDES } from '../redes.js';
 import { exigirLogin } from './auth.js';
 import { pontuarCurtida, pontuarComentario, pontuarPublicacao, estornar } from '../pontos.js';
+import { idsEmDestaque } from '../premios.js';
 
 const texto = (v) => (typeof v === 'string' ? v.trim() : '');
 
@@ -67,8 +68,18 @@ export function rotasPosts(ctx) {
 
   r.get('/', (req, res) => {
     const rede = NOMES_REDES.includes(req.query.rede) ? req.query.rede : undefined;
-    const posts = listarPosts(ctx, { eu: req.usuario?.id ?? 0, rede, antes: req.query.antes, limite: req.query.limite });
-    res.json({ posts, proximo: posts.length ? posts.at(-1).id : null });
+    const eu = req.usuario?.id ?? 0;
+    const posts = listarPosts(ctx, { eu, rede, antes: req.query.antes, limite: req.query.limite });
+    // Posts em destaque (prêmio da 2ª fase) vêm à parte, só na primeira página, sem mexer na paginação.
+    const destaques = req.query.antes
+      ? []
+      : idsEmDestaque(ctx)
+          .map(({ post_id: id, ate }) => {
+            const p = ctx.db.prepare(`${SELECT_POST} WHERE p.id = @id`).get({ id, eu });
+            return p && (!rede || p.rede === rede) ? { ...postPublico(p), destaqueAte: ate } : null;
+          })
+          .filter(Boolean);
+    res.json({ posts, proximo: posts.length ? posts.at(-1).id : null, destaques });
   });
 
   r.post('/', exigirLogin, (req, res) => {
