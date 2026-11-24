@@ -12,7 +12,8 @@
     "cooldownSegundos": 10,
     "comentarioMinCaracteres": 20,
     "comentariosPontuadosPorPost": 1,
-    "postsPorDia": 5
+    "postsPorDia": 5,
+    "cadastrosPorIpHora": 10
   },
   "ranking": {
     "limiarTopGeral": 10,

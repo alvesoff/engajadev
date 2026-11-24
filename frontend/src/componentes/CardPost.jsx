@@ -72,7 +72,7 @@ export default function CardPost({ post: inicial, mostrarAutor = true, destaque 
       )}
       <Link to={`/p/${post.id}`} className="post-corpo">
         {!mostrarAutor && <SeloRede rede={post.rede} />}
-        <h3>{post.titulo}</h3>
+        <h2 className="post-titulo">{post.titulo}</h2>
         {post.descricao && <p>{post.descricao}</p>}
       </Link>
       <footer className="post-acoes">

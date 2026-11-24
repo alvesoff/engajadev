@@ -34,6 +34,10 @@ export const ESQUEMA = {
     padrao: 1, min: 0, max: 100, grupo: 'Limites (anti-gaming)',
     rotulo: 'Comentários que pontuam por post', ajuda: 'Quantos comentários da mesma pessoa no mesmo post pontuam. 0 = todos.',
   },
+  'limites.cadastrosPorIpHora': {
+    padrao: 10, min: 0, max: 100000, grupo: 'Limites (anti-gaming)',
+    rotulo: 'Contas novas por IP por hora', ajuda: 'Evita criar contas falsas em série para inflar pontos. 0 = sem limite.',
+  },
   'limites.postsPorDia': {
     padrao: 5, min: 0, max: 1000, grupo: 'Limites (anti-gaming)',
     rotulo: 'Posts por dia', ajuda: 'Quantos links cada pessoa pode divulgar por dia. 0 = sem limite.',

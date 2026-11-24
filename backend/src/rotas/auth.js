@@ -110,19 +110,63 @@ export function rotasAuth(ctx, { porEmail = 5, porIp = 50, janelaMs = 15 * MIN }
   const limiteEmail = criarLimitador({ maximo: porEmail, janelaMs, agora: ctx.agora });
   const limiteIp = criarLimitador({ maximo: porIp, janelaMs, agora: ctx.agora });
 
+  // Contas criadas por IP na última hora (anti-gaming: contas falsas em série).
+  // A vaga é reservada antes de calcular o hash (que é demorado), para pedidos simultâneos
+  // não passarem do limite; se o cadastro falhar, a vaga volta.
+  const cadastrosPorIp = new Map(); // ip -> [instantes]
+  function reservarCadastro(ip) {
+    const maximo = ctx.regras().limites.cadastrosPorIpHora;
+    const desde = ctx.agora() - 60 * MIN;
+    const recentes = (cadastrosPorIp.get(ip) ?? []).filter((t) => t > desde);
+    if (recentes.length) cadastrosPorIp.set(ip, recentes);
+    else cadastrosPorIp.delete(ip);
+    if (maximo > 0 && recentes.length >= maximo) {
+      const espera = Math.max(1, Math.ceil((recentes[0] + 60 * MIN - ctx.agora()) / 1000));
+      const minutos = Math.ceil(espera / 60);
+      const e = erro(429, `Muitas contas criadas a partir desta rede. Espere ${minutos} ${minutos === 1 ? 'minuto' : 'minutos'} e tente de novo.`, {
+        esperarSegundos: espera,
+      });
+      e.retryAfter = espera;
+      throw e;
+    }
+    const instante = ctx.agora();
+    cadastrosPorIp.set(ip, [...recentes, instante]);
+    return () => {
+      const lista = cadastrosPorIp.get(ip) ?? [];
+      const i = lista.indexOf(instante);
+      if (i >= 0) lista.splice(i, 1);
+      if (!lista.length) cadastrosPorIp.delete(ip);
+    };
+  }
+
   r.post('/cadastro', async (req, res) => {
     const { nome, usuario, email, senha } = validarCadastro(req.body);
-    const existe = ctx.db.prepare('SELECT usuario, email FROM usuarios WHERE usuario = ? OR email = ?').get(usuario, email);
-    if (existe) {
-      if (existe.email.toLowerCase() === email) throw erro(409, 'Já existe uma conta com este e-mail. Tente entrar.', { campo: 'email' });
-      throw erro(409, 'Este @usuário já está em uso. Escolha outro.', { campo: 'usuario' });
+    let devolver;
+    try {
+      devolver = reservarCadastro(req.ip);
+    } catch (e) {
+      res.setHeader('Retry-After', String(e.retryAfter));
+      throw e;
     }
-    const senhaHash = await gerarHash(senha);
-    const { lastInsertRowid } = ctx.db
-      .prepare('INSERT INTO usuarios (nome, usuario, email, senha_hash, criado_em) VALUES (?, ?, ?, ?, ?)')
-      .run(nome, usuario, email, senhaHash, ctx.agora());
-    criarSessao(ctx, res, Number(lastInsertRowid));
-    const u = ctx.db.prepare('SELECT * FROM usuarios WHERE id = ?').get(lastInsertRowid);
+    let id;
+    try {
+      const existe = ctx.db.prepare('SELECT usuario, email FROM usuarios WHERE usuario = ? OR email = ?').get(usuario, email);
+      if (existe) {
+        if (existe.email.toLowerCase() === email) throw erro(409, 'Já existe uma conta com este e-mail. Tente entrar.', { campo: 'email' });
+        throw erro(409, 'Este @usuário já está em uso. Escolha outro.', { campo: 'usuario' });
+      }
+      const senhaHash = await gerarHash(senha);
+      id = Number(
+        ctx.db
+          .prepare('INSERT INTO usuarios (nome, usuario, email, senha_hash, criado_em) VALUES (?, ?, ?, ?, ?)')
+          .run(nome, usuario, email, senhaHash, ctx.agora()).lastInsertRowid,
+      );
+    } catch (e) {
+      devolver();
+      throw e;
+    }
+    criarSessao(ctx, res, id);
+    const u = ctx.db.prepare('SELECT * FROM usuarios WHERE id = ?').get(id);
     res.status(201).json(eu(u));
   });
 

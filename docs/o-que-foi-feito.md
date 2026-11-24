@@ -14,7 +14,7 @@ São duas pastas separadas. O backend sobe primeiro.
 # backend (API) em http://localhost:4400
 cd backend
 npm install
-npm test                                  # 125 testes automáticos
+npm test                                  # 131 testes automáticos
 DB_PATH=./data/exemplo.db npm run semear  # opcional: dados de exemplo
 DB_PATH=./data/exemplo.db ADMIN_EMAILS=anadev@exemplo.com npm start
 
@@ -34,6 +34,7 @@ As contas de exemplo usam a senha `senha-forte-123`. Com o comando acima, `anade
 - A senha é guardada com **scrypt** (um embaralhamento forte, que não tem volta). A senha nunca sai do servidor.
 - A sessão fica num cookie que o JavaScript da página não consegue ler (`httpOnly`). No banco fica só um código derivado do token, nunca o token.
 - Depois de 5 senhas erradas para o mesmo e-mail, o login dele fica bloqueado por 15 minutos.
+- Um site de fora não consegue curtir, comentar, postar ou resgatar em nome de quem está conectado (proteção contra CSRF). As respostas da API também não ficam guardadas em cache.
 - Todas as mensagens de erro estão em português e apontam o campo errado.
 
 ### Postar e feed
@@ -80,6 +81,7 @@ As contas de exemplo usam a senha `senha-forte-123`. Com o comando acima, `anade
 - **Comentário curto** (menos de 20 letras, como "Top!") é publicado, mas não pontua.
 - **Só o primeiro comentário** da pessoa em cada post pontua.
 - **Até 5 posts por dia** por pessoa.
+- **Até 10 contas novas por IP por hora**, para dificultar contas falsas criadas em série para inflar os pontos de alguém.
 
 ### Perfil público
 
@@ -117,6 +119,7 @@ Entrar/criar conta, feed, divulgar post, post (curtir e comentar), rankings, car
 - **Celular:** menu fixo embaixo (Feed, Rankings, Postar, Carteira, Perfil), botões grandes para o dedo e campos com letra de 16px (o iPhone não dá zoom sozinho).
 - **Computador:** menu no topo, saldo e botão "Postar" sempre à mão e o Top da Semana numa coluna ao lado.
 - Funciona no modo escuro do sistema.
+- **Acessibilidade:** todas as telas passam no verificador automático axe (regras WCAG 2.1 AA), no tema claro e no escuro, no celular e no computador. Textos e selos têm contraste de pelo menos 4,5:1, links no meio do texto são sublinhados, os títulos seguem a ordem certa, dá para navegar só com o teclado (foco visível e atalho "Pular para o conteúdo") e os números de curtidas e comentários são lidos com o nome pelo leitor de tela.
 
 ## Critério de pronto, item por item
 
@@ -135,7 +138,7 @@ Entrar/criar conta, feed, divulgar post, post (curtir e comentar), rankings, car
 - **O engajamento que pontua acontece dentro do EngajaDev.** As redes não contam para sistemas de fora quem curtiu ou comentou. Por isso seguimos o caminho 1 da [discussão #2](https://github.com/alvesoff/engajadev/discussions/2): o link leva ao post original, mas a curtida e o comentário que valem ponto são feitos aqui. Assim o ponto é confiável, e ninguém é recompensado por engajar no LinkedIn ou no Instagram, o que essas redes podem tratar como engajamento falso.
 - **Duas janelas de ranking (Semana e Geral).** A visão fala em "três janelas", mas só nomeia duas. Ficamos com as duas nomeadas, para não inventar regra. Um "Top do Mês" é fácil de acrescentar depois, porque o ranking é só uma soma sobre um período.
 - **Semana virando na segunda 00:00 de Brasília.** É o padrão mais comum. Dia, hora e fuso mudam no arquivo de regras.
-- **Valores iniciais** (1 por curtida, 3 por comentário, 30/60 por dia, 10 segundos, 5 posts por dia, 10 pontos no Top Geral) foram escolhidos para começar. Todos mudam no arquivo ou na tela de admin.
+- **Valores iniciais** (1 por curtida, 3 por comentário, 30/60 por dia, 10 segundos, 5 posts por dia, 10 contas novas por IP por hora, 10 pontos no Top Geral) foram escolhidos para começar. Todos mudam no arquivo ou na tela de admin.
 - **Quem é admin** é definido pela variável `ADMIN_EMAILS` do backend. É o jeito mais simples, sem precisar de uma tela de permissões agora.
 - **Limite diário acabou:** a curtida ou o comentário continua valendo no post, só não pontua. Se quem engajou já bateu o limite, o autor também não ganha. Isso evita usar contas "cheias" só para inflar o post de alguém.
 - **Stack:** Node.js + Express + SQLite nativo do Node no backend, React + Vite nas telas. A [votação da stack](https://github.com/alvesoff/engajadev/discussions/1) ainda está aberta. Escolhemos o que roda sem instalar nada além do Node e é fácil para quem está começando. Trocar SQLite por PostgreSQL depois é simples, porque as consultas são SQL comum.
@@ -165,7 +168,7 @@ backend/
     premios.js         catálogo, resgate, entrega e cancelamento (2ª fase)
     semear.js          dados de exemplo (npm run semear)
     rotas/             auth, posts, rankings, carteira, usuarios, regras, premios
-  test/                125 testes automáticos
+  test/                131 testes automáticos
 frontend/
   src/
     App.jsx            menu (embaixo no celular, no topo no computador) e rotas

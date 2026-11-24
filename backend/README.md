@@ -34,7 +34,7 @@ npm test
 | `NODE_ENV` | `development` | Em `production` o cookie sai com `Secure` (só HTTPS) |
 | `REGRAS_PATH` | `./config/regras.json` | Arquivo com as regras do jogo |
 | `ADMIN_EMAILS` | vazio | E-mails de quem administra, separados por vírgula. Só essas pessoas mudam as regras pela tela de admin |
-| `TRUST_PROXY` | desligado | Número de proxies na frente da API (ex.: `1`), para o limite por IP ver o IP real |
+| `TRUST_PROXY` | desligado | Número de proxies na frente da API (ex.: `1`), para os limites por IP (login e contas novas) verem o IP real. **Configure sempre que houver proxy** (nginx, Render, Railway...): sem isso todo mundo parece vir do mesmo IP e o limite vale para o site inteiro |
 
 ## Rotas
 
@@ -92,6 +92,7 @@ Valores padrão (todos mudam no arquivo de regras ou na tela de admin):
 - **Comentário com menos de 20 caracteres** é publicado, mas não pontua. Só o primeiro comentário da pessoa em cada post pontua.
 - **Curtida pontua uma vez só:** descurtir devolve os pontos, e curtir de novo não soma de novo.
 - **Até 5 posts por dia.**
+- **Até 10 contas novas por IP por hora**, para ninguém criar contas falsas em série e usá-las para pontuar os próprios posts. Passou disso, o cadastro responde `429` com o tempo de espera.
 
 O dia vira à meia-noite de Brasília.
 
@@ -101,3 +102,5 @@ O dia vira à meia-noite de Brasília.
 - Sessão por cookie `httpOnly` e `SameSite=Lax`, válida por 30 dias. No banco fica só o hash do token.
 - Limite de tentativas de login: 5 erros por e-mail ou 50 por IP em 15 minutos bloqueiam até a janela acabar (`429`).
 - E-mail inexistente e senha errada dão a mesma resposta, no mesmo tempo, para não revelar quem tem conta.
+- Pedido que muda dados (POST, PUT, DELETE) vindo de outro site é recusado com `403`. O navegador informa a origem no cabeçalho `Sec-Fetch-Site`. Isso protege contra CSRF, e a tela continua funcionando porque fica no mesmo endereço da API.
+- Toda resposta da API sai com `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: same-origin` e uma `Content-Security-Policy` que não deixa a API abrir dentro de outro site.
