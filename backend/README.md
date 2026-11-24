@@ -46,6 +46,7 @@ Todas recebem e devolvem JSON. Em erro, a resposta é `{ "erro": "mensagem em po
 | `POST` | `/api/auth/entrar` | Entra com `email` e `senha`. `200` |
 | `POST` | `/api/auth/sair` | Encerra a sessão. `204` |
 | `GET` | `/api/auth/eu` | Devolve quem está conectado, ou `401` |
+| `PUT` | `/api/auth/perfil` | Edita o próprio `nome` e a `bio` (até 160 caracteres), que aparecem no perfil público |
 | `GET` | `/api/auth/sessoes` | Em quantos outros aparelhos a conta está aberta |
 | `POST` | `/api/auth/sair-dos-outros` | Encerra a conta nos outros aparelhos (este continua) |
 | `PUT` | `/api/auth/senha` | Troca a senha (`senhaAtual`, `senhaNova`) e sai dos outros aparelhos. 5 erros da senha atual bloqueiam por 15 minutos |

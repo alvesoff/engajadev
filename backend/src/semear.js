@@ -14,12 +14,12 @@ const HORA = 3_600_000;
 const DIA = 24 * HORA;
 
 const PESSOAS = [
-  ['Ana Souza', 'ana_dev'],
-  ['Bruno Lima', 'brunolima'],
-  ['Carla Mendes', 'carla_codes'],
-  ['Diego Rocha', 'diegorocha'],
-  ['Elisa Prado', 'elisa_front'],
-  ['Fábio Nunes', 'fabio_ops'],
+  ['Ana Souza', 'ana_dev', 'Dev back-end. Escrevo sobre Node, testes e APIs.'],
+  ['Bruno Lima', 'brunolima', 'Estudando arquitetura de software e contando o que aprendo.'],
+  ['Carla Mendes', 'carla_codes', 'Front-end com TypeScript. Do zero ao primeiro emprego em público.'],
+  ['Diego Rocha', 'diegorocha', ''],
+  ['Elisa Prado', 'elisa_front', 'CSS, acessibilidade e interfaces que funcionam no celular.'],
+  ['Fábio Nunes', 'fabio_ops', 'DevOps, terminal e automação.'],
 ];
 
 // [autor, link, título, descrição, horas atrás]
@@ -71,12 +71,12 @@ export async function semear(db, { agora = Date.now() } = {}) {
   const ctx = { db, agora: () => relogio, regras: criarLeitorRegras() };
 
   transacao(db, () => {
-    const ids = PESSOAS.map(([nome, usuario], i) => {
+    const ids = PESSOAS.map(([nome, usuario, bio], i) => {
       const criado = agora - (30 - i) * DIA;
       return Number(
         db
-          .prepare('INSERT INTO usuarios (nome, usuario, email, senha_hash, criado_em) VALUES (?, ?, ?, ?, ?)')
-          .run(nome, usuario, `${usuario.replace(/_/g, '')}@exemplo.com`, senha, criado).lastInsertRowid,
+          .prepare('INSERT INTO usuarios (nome, usuario, email, senha_hash, bio, criado_em) VALUES (?, ?, ?, ?, ?, ?)')
+          .run(nome, usuario, `${usuario.replace(/_/g, '')}@exemplo.com`, senha, bio, criado).lastInsertRowid,
       );
     });
 

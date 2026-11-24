@@ -30,7 +30,7 @@ Para ver as telas com conteúdo, rode antes no backend `DB_PATH=./data/exemplo.d
 | `/postar` | Divulgar um post (mostra a rede descoberta pelo link) |
 | `/p/:id` | Post: abrir o original, curtir e comentar, com o aviso dos pontos ganhos |
 | `/rankings` | Top Engajador e Top Criador, da semana e geral |
-| `/conta` | Minha conta: dados, trocar senha e sair dos outros aparelhos |
+| `/conta` | Minha conta: nome e bio do perfil, trocar senha e sair dos outros aparelhos |
 | `/carteira` | Saldo de pontos, limite de hoje, meus resgates e extrato |
 | `/u/:usuario` | Perfil público: posts, pontos e posição |
 | `/como-pontuar` | Regras em vigor, lidas do backend |

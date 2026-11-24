@@ -140,6 +140,9 @@ export function abrirBanco(caminho = ':memory:') {
 /** Acrescenta colunas novas em bancos criados antes delas existirem. */
 function migrar(db) {
   const colunas = (tabela) => new Set(db.prepare(`PRAGMA table_info(${tabela})`).all().map((c) => c.name));
+  const usuarios = colunas('usuarios');
+  // Perfil: uma frase sobre a pessoa (mini-portfólio).
+  if (!usuarios.has('bio')) db.exec("ALTER TABLE usuarios ADD COLUMN bio TEXT NOT NULL DEFAULT ''");
   const posts = colunas('posts');
   // Moderação: post removido some do site, mas a linha fica (histórico e estorno de pontos).
   if (!posts.has('removido_em')) db.exec('ALTER TABLE posts ADD COLUMN removido_em INTEGER');

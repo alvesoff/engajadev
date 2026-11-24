@@ -39,6 +39,91 @@ function CampoSenha({ id, rotulo, valor, aoMudar, erro, dica, autoComplete }) {
   );
 }
 
+const BIO_MAX = 160;
+
+/** Nome e bio, que aparecem no perfil público. */
+function EditarPerfil({ eu }) {
+  const { avisar, recarregar } = useSessao();
+  const [nome, setNome] = useState(eu.nome);
+  const [bio, setBio] = useState(eu.bio ?? '');
+  const [erros, setErros] = useState({});
+  const [salvando, setSalvando] = useState(false);
+  const mudou = nome.trim() !== eu.nome || bio.trim() !== (eu.bio ?? '');
+
+  async function salvar(e) {
+    e.preventDefault();
+    if (nome.trim().length < 2) return setErros({ nome: 'O nome deve ter de 2 a 60 caracteres.' });
+    setSalvando(true);
+    try {
+      const u = await api('/auth/perfil', { metodo: 'PUT', corpo: { nome, bio } });
+      setNome(u.nome);
+      setBio(u.bio);
+      await recarregar();
+      avisar({ tipo: 'ok', texto: 'Perfil atualizado.' });
+    } catch (e2) {
+      if (e2.campo) setErros({ [e2.campo]: e2.message });
+      else avisar({ tipo: 'erro', texto: e2.message });
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  return (
+    <form className="formulario sem-borda" onSubmit={salvar} noValidate>
+      <div className={`campo${erros.nome ? ' com-erro' : ''}`}>
+        <label htmlFor="perfil-nome">Nome</label>
+        <input
+          id="perfil-nome"
+          value={nome}
+          maxLength={60}
+          autoComplete="name"
+          onChange={(e) => {
+            setNome(e.target.value);
+            setErros({});
+          }}
+          aria-invalid={erros.nome ? 'true' : undefined}
+          aria-describedby={erros.nome ? 'perfil-nome-erro' : undefined}
+        />
+        {erros.nome && (
+          <p className="erro-campo" id="perfil-nome-erro">
+            {erros.nome}
+          </p>
+        )}
+      </div>
+      <div className={`campo${erros.bio ? ' com-erro' : ''}`}>
+        <label htmlFor="perfil-bio">
+          Bio <span className="sutil">(opcional)</span>
+        </label>
+        <textarea
+          id="perfil-bio"
+          value={bio}
+          rows={3}
+          maxLength={BIO_MAX}
+          placeholder="Ex.: Dev front-end. Escrevo sobre React e acessibilidade."
+          onChange={(e) => {
+            setBio(e.target.value);
+            setErros({});
+          }}
+          aria-invalid={erros.bio ? 'true' : undefined}
+          aria-describedby={erros.bio ? 'perfil-bio-erro' : 'perfil-bio-dica'}
+        />
+        {erros.bio ? (
+          <p className="erro-campo" id="perfil-bio-erro">
+            {erros.bio}
+          </p>
+        ) : (
+          <p className="dica" id="perfil-bio-dica">
+            Aparece no seu perfil público. {bio.length}/{BIO_MAX} caracteres.
+          </p>
+        )}
+      </div>
+      <button type="submit" className="botao primario" disabled={salvando || !mudou}>
+        {salvando ? 'Salvando…' : 'Salvar perfil'}
+      </button>
+    </form>
+  );
+}
+
 export default function Conta() {
   const { eu, avisar } = useSessao();
   const [atual, setAtual] = useState('');
@@ -110,10 +195,13 @@ export default function Conta() {
     <div className="pilha estreito">
       <h1>Minha conta</h1>
       <section className="card">
-        <h2>Seus dados</h2>
+        <h2>Seu perfil</h2>
+        <EditarPerfil eu={eu} />
+      </section>
+
+      <section className="card">
+        <h2>Dados da conta</h2>
         <dl className="dados-conta">
-          <dt>Nome</dt>
-          <dd>{eu.nome}</dd>
           <dt>@usuário</dt>
           <dd>
             <Link to={`/u/${eu.usuario}`}>@{eu.usuario}</Link>
