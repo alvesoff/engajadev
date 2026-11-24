@@ -31,7 +31,12 @@ Ainda não definida. A comunidade vai escolher na [votação da stack](https://g
 
 ## Como executar
 
-Ainda não há código. Assim que a stack for escolhida, esta seção vai trazer instalação, configuração e comandos.
+O projeto tem duas pastas separadas:
+
+- [`backend/`](backend/README.md): a API (contas, posts, curtidas, comentários, pontos, rankings, carteira e regras).
+- [`frontend/`](frontend/README.md): as telas, para celular e computador.
+
+Cada uma tem um README com os comandos para rodar. Comece pelo backend. O que já funciona e as decisões tomadas estão em [docs/o-que-foi-feito.md](docs/o-que-foi-feito.md).
 
 ## Status
 
