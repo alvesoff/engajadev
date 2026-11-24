@@ -46,7 +46,7 @@ export function resgatar(ctx, usuario, premioId, { postId } = {}) {
     if (premio.tipo === 'destaque') {
       if (!postId) throw erro(400, 'Escolha qual dos seus posts vai ficar em destaque.', { campo: 'postId' });
       post = ctx.db.prepare('SELECT * FROM posts WHERE id = ?').get(Number(postId) || 0);
-      if (!post || post.usuario_id !== usuario.id) {
+      if (!post || post.removido_em || post.usuario_id !== usuario.id) {
         throw erro(400, 'Você só pode destacar um post seu.', { campo: 'postId' });
       }
       const ativo = ctx.db
@@ -181,9 +181,9 @@ export function validarPremio(corpo, atual) {
 export function idsEmDestaque(ctx) {
   return ctx.db
     .prepare(
-      `SELECT post_id, MAX(destaque_ate) AS ate FROM resgates
-       WHERE post_id IS NOT NULL AND status <> 'cancelado' AND destaque_ate > ?
-       GROUP BY post_id ORDER BY ate DESC LIMIT 5`,
+      `SELECT r.post_id, MAX(r.destaque_ate) AS ate FROM resgates r JOIN posts p ON p.id = r.post_id
+       WHERE p.removido_em IS NULL AND r.status <> 'cancelado' AND r.destaque_ate > ?
+       GROUP BY r.post_id ORDER BY ate DESC LIMIT 5`,
     )
     .all(ctx.agora());
 }

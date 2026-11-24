@@ -74,10 +74,6 @@ a { color: var(--primaria); text-decoration: none; }
 a:hover { text-decoration: underline; }
 /* link no meio de um texto: sublinhado, para não depender só da cor */
 p a:not(.botao) { text-decoration: underline; text-underline-offset: 2px; }
-.so-leitor {
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
-  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
-}
 svg { display: block; flex: none; }
 button, input, textarea { font: inherit; color: inherit; }
 code { background: var(--superficie-2); padding: 0.1em 0.35em; border-radius: 6px; font-size: 0.9em; overflow-wrap: anywhere; }
@@ -191,6 +187,8 @@ main { min-width: 0; }
 .botao.primario { background: var(--primaria); color: var(--primaria-texto); border-color: transparent; }
 .botao.primario:hover:not(:disabled) { background: var(--primaria-escura); }
 .botao.largo { width: 100%; }
+.botao.perigo { color: var(--erro); border-color: color-mix(in srgb, var(--erro) 45%, transparent); }
+.botao.perigo.cheio { background: var(--erro); color: var(--erro-fundo); border-color: transparent; }
 .botao.pequeno { min-height: 36px; padding: 0.2rem 0.7rem; font-size: 0.875rem; }
 .botao:disabled { opacity: 0.6; cursor: progress; }
 .botao-icone {
@@ -314,6 +312,8 @@ main { min-width: 0; }
 .acao.abrir { margin-left: auto; color: var(--primaria); }
 .acao.estatica { cursor: default; }
 .acao.estatica:hover { background: none; }
+.remover-post { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--borda); }
+.remover-post p { margin: 0; flex: 1 1 100%; }
 @keyframes pulsar { 50% { transform: scale(1.3); } }
 @media (prefers-reduced-motion: reduce) { .acao.ativa svg { animation: none; } }
 .post-detalhe .descricao { color: var(--texto-2); white-space: pre-line; overflow-wrap: anywhere; }

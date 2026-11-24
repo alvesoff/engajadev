@@ -15,9 +15,11 @@ export function perfilPublico(ctx, u, eu = 0) {
   const n = ctx.db
     .prepare(
       `SELECT
-         (SELECT COUNT(*) FROM posts WHERE usuario_id = @id) AS posts,
-         (SELECT COUNT(*) FROM curtidas c JOIN posts p ON p.id = c.post_id WHERE p.usuario_id = @id AND c.ativa = 1) AS curtidas_recebidas,
-         (SELECT COUNT(*) FROM comentarios c JOIN posts p ON p.id = c.post_id WHERE p.usuario_id = @id) AS comentarios_recebidos,
+         (SELECT COUNT(*) FROM posts WHERE usuario_id = @id AND removido_em IS NULL) AS posts,
+         (SELECT COUNT(*) FROM curtidas c JOIN posts p ON p.id = c.post_id
+           WHERE p.usuario_id = @id AND p.removido_em IS NULL AND c.ativa = 1) AS curtidas_recebidas,
+         (SELECT COUNT(*) FROM comentarios c JOIN posts p ON p.id = c.post_id
+           WHERE p.usuario_id = @id AND p.removido_em IS NULL) AS comentarios_recebidos,
          (SELECT COUNT(*) FROM curtidas WHERE usuario_id = @id AND ativa = 1) AS curtidas_feitas,
          (SELECT COUNT(*) FROM comentarios WHERE usuario_id = @id) AS comentarios_feitos`,
     )

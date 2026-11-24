@@ -32,7 +32,7 @@ export function postPublico(p) {
 
 /** Feed: do mais novo para o mais antigo, paginado pelo id ("antes"). */
 export function listarPosts(ctx, { eu = 0, rede, autorId, antes, limite = 20 }) {
-  const where = [];
+  const where = ['p.removido_em IS NULL'];
   const params = { eu, limite: Math.min(Math.max(Number(limite) || 20, 1), 50) };
   if (rede) {
     where.push('p.rede = @rede');
@@ -46,13 +46,14 @@ export function listarPosts(ctx, { eu = 0, rede, autorId, antes, limite = 20 }) 
     where.push('p.id < @antes');
     params.antes = Number(antes) || 0;
   }
-  const sql = `${SELECT_POST} ${where.length ? 'WHERE ' + where.join(' AND ') : ''} ORDER BY p.id DESC LIMIT @limite`;
+  const sql = `${SELECT_POST} WHERE ${where.join(' AND ')} ORDER BY p.id DESC LIMIT @limite`;
   return ctx.db.prepare(sql).all(params).map(postPublico);
 }
 
 function buscarPost(ctx, id, eu = 0) {
   const p = ctx.db.prepare(`${SELECT_POST} WHERE p.id = @id`).get({ id: Number(id) || 0, eu });
   if (!p) throw erro(404, 'Post não encontrado.');
+  if (p.removido_em) throw erro(404, 'Este post foi removido.');
   return p;
 }
 
@@ -75,7 +76,7 @@ export function rotasPosts(ctx) {
       ? []
       : idsEmDestaque(ctx)
           .map(({ post_id: id, ate }) => {
-            const p = ctx.db.prepare(`${SELECT_POST} WHERE p.id = @id`).get({ id, eu });
+            const p = ctx.db.prepare(`${SELECT_POST} WHERE p.id = @id AND p.removido_em IS NULL`).get({ id, eu });
             return p && (!rede || p.rede === rede) ? { ...postPublico(p), destaqueAte: ate } : null;
           })
           .filter(Boolean);
@@ -176,6 +177,32 @@ export function rotasPosts(ctx) {
       comentario: comentarioPublico({ ...c, nome: req.usuario.nome, usuario: req.usuario.usuario }),
       pontos: resultado.pontos,
     });
+  });
+
+  /**
+   * Remover um post. Ele some do feed, do perfil e dos destaques, mas a linha fica no banco.
+   * - O autor apaga o próprio post: os pontos de todos ficam (foram ganhos de verdade).
+   * - O admin remove (spam, link quebrado, fora do tema): os pontos que o AUTOR ganhou com o post
+   *   saem do livro-razão e o link continua bloqueado. Quem curtiu ou comentou agiu de boa-fé e
+   *   mantém os pontos (e o saldo de ninguém fica negativo por culpa de outra pessoa).
+   * Nos dois casos o link continua bloqueado: apagar e divulgar de novo faria todos pontuarem
+   * outra vez pelo mesmo post.
+   */
+  r.delete('/:id', exigirLogin, (req, res) => {
+    const post = buscarPost(ctx, req.params.id, req.usuario.id);
+    const autor = post.usuario_id === req.usuario.id;
+    if (!autor && !ctx.ehAdmin(req.usuario)) throw erro(403, 'Só quem publicou ou quem administra pode remover este post.');
+    const motivo = autor ? 'autor' : 'moderacao';
+    const estornados = transacao(ctx.db, () => {
+      ctx.db
+        .prepare(
+          'UPDATE posts SET removido_em = ?, removido_por = ?, removido_motivo = ? WHERE id = ?',
+        )
+        .run(ctx.agora(), req.usuario.id, motivo, post.id);
+      if (motivo === 'autor') return 0;
+      return Number(ctx.db.prepare('DELETE FROM lancamentos WHERE post_id = ? AND usuario_id = ?').run(post.id, post.usuario_id).changes);
+    });
+    res.json({ removido: true, motivo, lancamentosEstornados: estornados });
   });
 
   return r;

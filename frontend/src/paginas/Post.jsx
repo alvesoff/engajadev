@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, tempoRelativo, mensagemPontos } from '../api.js';
 import { useSessao } from '../sessao.jsx';
 import Avatar from '../componentes/Avatar.jsx';
@@ -15,6 +15,9 @@ export default function Post() {
   const [regras, setRegras] = useState(null);
   const [enviando, setEnviando] = useState(false);
   const [erroComentario, setErroComentario] = useState('');
+  const [confirmarRemocao, setConfirmarRemocao] = useState(false);
+  const [removendo, setRemovendo] = useState(false);
+  const navegar = useNavigate();
 
   // Só busca depois de saber quem está conectado (eu !== undefined): assim uma resposta
   // antiga não chega depois de uma curtida e apaga a atualização.
@@ -50,6 +53,23 @@ export default function Post() {
       setErroComentario(e2.message);
     } finally {
       setEnviando(false);
+    }
+  }
+
+  async function remover() {
+    setRemovendo(true);
+    try {
+      const r = await api(`/posts/${id}`, { metodo: 'DELETE' });
+      avisar({
+        tipo: 'ok',
+        texto: r.motivo === 'autor' ? 'Seu post foi apagado.' : 'Post removido. Os pontos que o autor ganhou com ele foram retirados.',
+      });
+      recarregar();
+      navegar('/', { replace: true });
+    } catch (e) {
+      avisar({ tipo: 'erro', texto: e.message });
+      setRemovendo(false);
+      setConfirmarRemocao(false);
     }
   }
 
@@ -90,9 +110,32 @@ export default function Post() {
           <BotaoCurtir post={post} aoMudar={(p) => setDados((d) => ({ ...d, post: p }))} />
           <span className="acao estatica">
             <Icone nome="comentario" /> {post.comentarios}
-            <span className="so-leitor"> {post.comentarios === 1 ? 'comentário' : 'comentários'}</span>
+            <span className="sr"> {post.comentarios === 1 ? 'comentário' : 'comentários'}</span>
           </span>
         </footer>
+        {(proprio || eu?.admin) && (
+          <div className="remover-post">
+            {!confirmarRemocao ? (
+              <button type="button" className="botao perigo pequeno" onClick={() => setConfirmarRemocao(true)}>
+                {proprio ? 'Apagar meu post' : 'Remover post (moderação)'}
+              </button>
+            ) : (
+              <>
+                <p role="alert">
+                  {proprio
+                    ? 'Apagar este post? Ele sai do feed e do seu perfil, e este link não poderá ser divulgado de novo. Os pontos que você já ganhou continuam.'
+                    : 'Remover este post? Ele sai do site e o autor perde os pontos ganhos com ele. Quem curtiu ou comentou continua com os pontos.'}
+                </p>
+                <button type="button" className="botao perigo cheio pequeno" onClick={remover} disabled={removendo}>
+                  {removendo ? 'Removendo…' : proprio ? 'Sim, apagar' : 'Sim, remover'}
+                </button>
+                <button type="button" className="botao pequeno" onClick={() => setConfirmarRemocao(false)} disabled={removendo}>
+                  Cancelar
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </article>
 
       <section className="card" id="comentar">
